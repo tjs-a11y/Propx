@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PropX — Live Exchange</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Unbounded:wght@400;700;900&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#03050a;--bg2:#060c14;--bg3:#091018;--bg4:#0d1622;
+  --w:rgba(255,255,255,0.05);--w2:rgba(255,255,255,0.09);--w3:rgba(255,255,255,0.16);
+  --g:#00cc7a;--g2:#00ff99;--g3:rgba(0,204,122,0.1);--g4:rgba(0,204,122,0.05);
+  --r:#ff2d55;--r2:#ff6b80;--r3:rgba(255,45,85,0.1);
+  --b:#0060ff;--b2:#4d90ff;--b3:rgba(0,96,255,0.1);--b4:rgba(0,96,255,0.05);
+  --gold:#f0a500;--gold2:#ffc444;--gold3:rgba(240,165,0,0.1);--gold4:rgba(240,165,0,0.05);
+  --pu:#7c3aed;--pu2:#a78bfa;--pu3:rgba(124,58,237,0.1);
+  --cy:#0891b2;--cy2:#22d3ee;--cy3:rgba(8,145,178,0.1);
+  --text:#dce8f5;--t2:rgba(220,232,245,0.5);--t3:rgba(220,232,245,0.24);--t4:rgba(220,232,245,0.07);
+  --mono:'Space Mono',monospace;--disp:'Unbounded',sans-serif;--body:'Manrope',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--body);overflow-x:hidden;}
+::-webkit-scrollbar{width:2px;}::-webkit-scrollbar-thumb{background:var(--g);}
+.tkr{background:var(--bg2);border-bottom:1px solid var(--w2);height:30px;overflow:hidden;position:relative;}
+.tkr::before,.tkr::after{content:'';position:absolute;top:0;bottom:0;width:80px;z-index:2;pointer-events:none;}
+.tkr::before{left:0;background:linear-gradient(90deg,var(--bg2),transparent);}
+.tkr::after{right:0;background:linear-gradient(-90deg,var(--bg2),transparent);}
+.tkr-inner{display:flex;align-items:center;height:30px;animation:scroll 60s linear infinite;width:max-content;}
+@keyframes scroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+.ti{padding:0 20px;display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:9px;border-right:1px solid var(--w);}
+.ti-m{color:var(--t3);}
+.ti-v{font-weight:700;}
+.up{color:var(--g);}
+.dn{color:var(--r);}
+nav{position:sticky;top:0;z-index:500;height:52px;display:flex;align-items:center;background:rgba(3,5,10,.98);border-bottom:1px solid var(--w2);backdrop-filter:blur(24px);}
+.nl{padding:0 18px;border-right:1px solid var(--w);height:100%;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.nlb{font-family:var(--disp);font-size:17px;font-weight:900;letter-spacing:-1px;}
+.nlb span{color:var(--g);}
+.nl-s{font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t3);}
+.ntabs{display:flex;height:100%;overflow-x:auto;flex:1;}
+.nt{padding:0 14px;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);cursor:pointer;border:none;background:transparent;font-family:var(--body);border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:5px;height:100%;}
+.nt:hover{color:var(--t2);}
+.nt.on{color:var(--g);border-bottom-color:var(--g);}
+.nav-r{margin-left:auto;padding:0 14px;display:flex;align-items:center;gap:7px;flex-shrink:0;}
+.lp{display:flex;align-items:center;gap:4px;padding:3px 9px;background:var(--g3);border:1px solid rgba(0,204,122,.18);}
+.ldot{width:4px;height:4px;border-radius:50%;background:var(--g);animation:pulse 1.8s infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,204,122,.4);}60%{opacity:.5;box-shadow:0 0 0 4px transparent;}}
+.lt{font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--g);}
+.nbtn{padding:6px 14px;font-size:9px;font-weight:700;border:none;cursor:pointer;font-family:var(--body);transition:all .15s;}
+.nb-o{background:transparent;border:1px solid var(--w3);color:var(--t2);}
+.nb-o:hover{border-color:var(--g);color:var(--g);}
+.nb-g{background:var(--g);color:var(--bg);}
+.nb-g:hover{background:var(--g2);}
+.view{display:none;min-height:calc(100vh - 82px);}
+.view.on{display:block;}
+.exch{display:grid;grid-template-columns:260px 1fr 280px;height:calc(100vh - 82px);overflow:hidden;}
+.ex-l{background:var(--bg2);border-right:1px solid var(--w);overflow-y:auto;display:flex;flex-direction:column;}
+.ex-c{overflow-y:auto;background:var(--bg);}
+.ex-r{background:var(--bg2);border-left:1px solid var(--w);overflow-y:auto;display:flex;flex-direction:column;}
+.phd{padding:10px 14px;border-bottom:1px solid var(--w);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg2);z-index:1;flex-shrink:0;}
+.phd-t{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t3);}
+.phd-v{font-family:var(--mono);font-size:11px;color:var(--g);}
+.ob-lbl{padding:5px 14px;font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border-bottom:1px solid var(--w);background:var(--bg3);}
+.ob-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:6px;padding:5px 14px;border-bottom:1px solid var(--w);cursor:pointer;transition:background .12s;position:relative;overflow:hidden;}
+.ob-row:hover{background:rgba(255,255,255,.015);}
+.ob-bg{position:absolute;left:0;top:0;bottom:0;opacity:.05;pointer-events:none;}
+.ob-p{font-family:var(--mono);font-size:11px;font-weight:700;}
+.ob-m{font-size:8px;color:var(--t3);}
+.ob-s{font-size:8px;color:var(--t3);text-align:right;}
+.ob-ask .ob-p{color:var(--r);}
+.ob-ask .ob-bg{background:var(--r);}
+.ob-bid .ob-p{color:var(--g);}
+.ob-bid .ob-bg{background:var(--g);}
+.ob-mid{padding:6px 14px;text-align:center;font-family:var(--mono);font-size:9px;color:var(--t3);border-bottom:1px solid var(--w);background:var(--bg3);}
+.ob-mid em{color:var(--gold);font-style:normal;}
+.rt-item{display:flex;align-items:center;gap:6px;padding:7px 14px;border-bottom:1px solid var(--w);font-size:9px;}
+.rt-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0;}
+.rt-addr{flex:1;color:var(--t2);}
+.rt-p{font-family:var(--mono);font-size:10px;font-weight:700;}
+.rt-t{font-size:8px;color:var(--t3);font-family:var(--mono);}
+.ex-topbar{padding:10px 18px;border-bottom:1px solid var(--w);display:flex;align-items:center;gap:0;background:var(--bg2);overflow-x:auto;flex-shrink:0;}
+.etb-s{padding:0 14px;border-right:1px solid var(--w);flex-shrink:0;}
+.etb-s:first-child{padding-left:0;}
+.etb-s:last-child{border-right:none;}
+.etb-l{font-size:7px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-bottom:2px;}
+.etb-v{font-family:var(--mono);font-size:12px;font-weight:700;}
+.filter-row{padding:8px 18px;border-bottom:1px solid var(--w);display:flex;align-items:center;gap:5px;flex-wrap:wrap;background:var(--bg2);flex-shrink:0;}
+.fc{padding:3px 10px;font-size:8px;font-weight:700;background:transparent;border:1px solid var(--w2);color:var(--t3);cursor:pointer;font-family:var(--body);transition:all .12s;}
+.fc.on{background:var(--g3);border-color:rgba(0,204,122,.25);color:var(--g);}
+.fc:hover{color:var(--t2);}
+.sort-s{background:var(--bg3);border:1px solid var(--w2);color:var(--t2);padding:3px 8px;font-family:var(--mono);font-size:8px;outline:none;margin-left:auto;cursor:pointer;}
+.sort-s option{background:var(--bg2);}
+.dfeed{padding:14px 18px;display:flex;flex-direction:column;gap:8px;}
+.dcard{background:var(--bg2);border:1px solid var(--w);cursor:pointer;transition:border-color .15s;position:relative;overflow:hidden;}
+.dcard:hover{border-color:var(--w3);}
+.dcard.hot{border-color:rgba(240,165,0,.25);}
+.dcard.isnew{border-color:rgba(0,204,122,.25);}
+.dc-acc{height:2px;position:absolute;top:0;left:0;right:0;}
+.dc-top{padding:10px 14px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+.dc-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:5px;}
+.dc-addr{font-size:12px;font-weight:700;line-height:1.2;margin-bottom:1px;}
+.dc-city{font-size:9px;color:var(--t3);}
+.dc-pr{text-align:right;flex-shrink:0;}
+.dc-price{font-family:var(--disp);font-size:18px;font-weight:700;line-height:1;color:var(--g);}
+.dc-price-lbl{font-size:7px;color:var(--t3);margin-bottom:1px;}
+.dc-roi{font-size:9px;color:var(--t3);margin-top:2px;}
+.dc-nums{display:grid;border-top:1px solid var(--w);}
+.dn{padding:7px 10px;border-right:1px solid var(--w);}
+.dn:last-child{border-right:none;}
+.dn-l{font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:2px;}
+.dn-v{font-family:var(--mono);font-size:10px;font-weight:700;}
+.bid-prog{height:2px;background:var(--w);}
+.bid-fill{height:2px;background:linear-gradient(90deg,var(--g),var(--cy2));transition:width .6s ease;}
+.dc-bot{padding:6px 14px;border-top:1px solid var(--w);display:flex;align-items:center;gap:6px;background:var(--bg3);}
+.dc-bids{font-size:8px;color:var(--t3);display:flex;align-items:center;gap:3px;flex:1;}
+.biddot{width:3px;height:3px;border-radius:50%;background:var(--g);}
+.dc-timer{font-family:var(--mono);font-size:8px;color:var(--gold);}
+.dc-btns{display:flex;gap:4px;}
+.dcb{padding:4px 10px;font-size:8px;font-weight:700;border:none;cursor:pointer;font-family:var(--body);}
+.dcb-bid{background:var(--g3);border:1px solid rgba(0,204,122,.25);color:var(--g);}
+.dcb-bid:hover{background:rgba(0,204,122,.18);}
+.dcb-w{background:transparent;border:1px solid var(--w2);color:var(--t3);}
+.dcb-w:hover{border-color:var(--gold);color:var(--gold);}
+.of{padding:14px;}
+.of-ttl{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t3);margin-bottom:12px;}
+.of-tabs{display:flex;border:1px solid var(--w2);margin-bottom:12px;}
+.of-tab{flex:1;padding:6px;font-size:8px;font-weight:700;text-align:center;cursor:pointer;border:none;background:transparent;color:var(--t3);font-family:var(--body);transition:all .12s;}
+.of-tab.on{background:var(--g);color:var(--bg);}
+.fi{display:flex;flex-direction:column;gap:3px;margin-bottom:8px;}
+.fi label{font-size:7px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);}
+.fi input,.fi select{background:var(--bg3);border:1px solid var(--w2);color:var(--text);padding:7px 9px;font-family:var(--mono);font-size:11px;outline:none;transition:border-color .15s;width:100%;}
+.fi input:focus,.fi select:focus{border-color:rgba(0,204,122,.4);}
+.fi input::placeholder{color:var(--t3);}
+.fi select option{background:var(--bg2);}
+.fi-2{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.sbtn{width:100%;padding:10px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border:none;cursor:pointer;font-family:var(--body);margin-top:3px;transition:all .15s;}
+.sbtn-g{background:var(--g);color:var(--bg);}
+.sbtn-g:hover{background:var(--g2);}
+.sbtn-b{background:var(--b);color:#fff;}
+.tn{font-size:8px;color:var(--t3);margin-top:4px;line-height:1.5;}
+.so-item{padding:9px 14px;border-bottom:1px solid var(--w);display:flex;gap:8px;align-items:flex-start;}
+.soi-main{flex:1;}
+.soi-name{font-size:10px;font-weight:700;margin-bottom:1px;}
+.soi-crit{font-size:8px;color:var(--t3);line-height:1.4;}
+.soi-price{font-family:var(--mono);font-size:11px;color:var(--g);flex-shrink:0;text-align:right;}
+.tag{display:inline-flex;align-items:center;gap:2px;padding:2px 7px;font-size:7px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+.tg{background:var(--g3);color:var(--g);border:1px solid rgba(0,204,122,.2);}
+.tr{background:var(--r3);color:var(--r2);border:1px solid rgba(255,45,85,.2);}
+.tb{background:var(--b3);color:var(--b2);border:1px solid rgba(0,96,255,.2);}
+.tgo{background:var(--gold3);color:var(--gold2);border:1px solid rgba(240,165,0,.2);}
+.tp{background:var(--pu3);color:var(--pu2);border:1px solid rgba(124,58,237,.2);}
+.tgr{background:var(--t4);color:var(--t3);border:1px solid var(--w);}
+.page{padding:22px;max-width:900px;margin:0 auto;}
+.ph-lbl{font-size:8px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--g);margin-bottom:4px;}
+.ph-title{font-family:var(--disp);font-size:clamp(20px,2.8vw,32px);font-weight:900;letter-spacing:-1px;line-height:1.05;}
+.ph-title em{font-style:normal;color:var(--g);}
+.ph-sub{font-size:12px;color:var(--t2);margin-top:4px;line-height:1.7;}
+.srow{display:grid;gap:1px;background:var(--w);border:1px solid var(--w);margin-bottom:16px;}
+.sc{background:var(--bg2);padding:12px 14px;}
+.sc-l{font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t3);margin-bottom:3px;}
+.sc-v{font-family:var(--disp);font-size:19px;font-weight:700;line-height:1;}
+.sc-s{font-size:8px;margin-top:2px;}
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:700;display:none;align-items:center;justify-content:center;backdrop-filter:blur(20px);}
+.mo.on{display:flex;}
+.mb{background:var(--bg2);border:1px solid var(--w2);width:100%;max-width:600px;max-height:90vh;overflow-y:auto;animation:mIn .2s ease-out;}
+@keyframes mIn{from{opacity:0;transform:scale(.94);}to{opacity:1;transform:scale(1);}}
+.mh{padding:13px 18px;border-bottom:1px solid var(--w);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg2);z-index:1;}
+.mt{font-family:var(--disp);font-size:15px;font-weight:700;letter-spacing:-.5px;}
+.mx{background:none;border:none;color:var(--t3);font-size:16px;cursor:pointer;}
+.mbody{padding:18px;}
+.mft{padding:11px 18px;border-top:1px solid var(--w);display:flex;gap:6px;justify-content:flex-end;position:sticky;bottom:0;background:var(--bg2);}
+.mbtn{padding:7px 16px;font-size:9px;font-weight:700;border:none;cursor:pointer;font-family:var(--body);}
+.mbtn-g{background:var(--g);color:var(--bg);}
+.mbtn-o{background:transparent;border:1px solid var(--w2);color:var(--t2);}
+.bid-inp{background:var(--bg3);border:2px solid var(--g);color:var(--text);padding:11px 14px;font-family:var(--mono);font-size:22px;font-weight:700;outline:none;width:100%;margin-bottom:8px;}
+.toast-wrap{position:fixed;bottom:14px;right:14px;z-index:9999;display:flex;flex-direction:column;gap:5px;pointer-events:none;}
+.toast{background:var(--bg2);border:1px solid var(--w2);padding:9px 13px;min-width:260px;max-width:350px;display:flex;align-items:flex-start;gap:7px;pointer-events:all;box-shadow:0 12px 40px rgba(0,0,0,.8);animation:tIn .2s ease-out;}
+@keyframes tIn{from{opacity:0;transform:translateX(10px);}to{opacity:1;transform:translateX(0);}}
+.ti{font-size:13px;flex-shrink:0;}
+.tt{font-size:10px;font-weight:700;margin-bottom:1px;}
+.tm{font-size:9px;color:var(--t2);line-height:1.4;}
+@media(max-width:1100px){.exch{grid-template-columns:1fr;height:auto;}.ex-l,.ex-r{display:none;}}
+</style>
+</head>
+<body>
+<div class="tkr"><div class="tkr-inner" id="ticker"></div></div>
+<nav>
+  <div class="nl"><div><div class="nlb">Prop<span>X</span></div><div class="nl-s">Live Exchange</div></div></div>
+  <div class="ntabs">
+    <button class="nt on" onclick="show('exchange')">⚡ Live Deals</button>
+    <button class="nt" onclick="show('buyers')">🏠 Join Buyer List</button>
+    <button class="nt" onclick="show('sellers')">📥 Submit a Deal</button>
+  </div>
+  <div class="nav-r">
+    <div class="lp"><span class="ldot"></span><span class="lt">Live</span></div>
+    <button class="nbtn nb-o" onclick="window.location.href='index.html'">← Back to PropX</button>
+  </div>
+</nav>
+
+<div class="view on" id="view-exchange">
+<div class="exch">
+  <div class="ex-l">
+    <div class="phd"><div class="phd-t">Order Book</div><div class="phd-v" id="ob-ct">247 buyers</div></div>
+    <div class="ob-lbl" style="color:var(--r)">ASK — Sellers</div>
+    <div id="ob-asks"></div>
+    <div class="ob-mid">Spread <em id="ob-spread">$12,400</em></div>
+    <div class="ob-lbl" style="color:var(--g)">BID — Standing Orders</div>
+    <div id="ob-bids"></div>
+    <div class="phd" style="margin-top:auto"><div class="phd-t">Recent Closes</div><div class="phd-v" style="color:var(--gold)">Today: 4</div></div>
+    <div id="rt-feed"></div>
+  </div>
+  <div class="ex-c">
+    <div class="ex-topbar">
+      <div class="etb-s"><div class="etb-l">Active Deals</div><div class="etb-v up" id="s-deals">312</div></div>
+      <div class="etb-s"><div class="etb-l">Total Volume</div><div class="etb-v">$48.2M</div></div>
+      <div class="etb-s"><div class="etb-l">Avg ROI</div><div class="etb-v up">31.4%</div></div>
+      <div class="etb-s"><div class="etb-l">Buyers</div><div class="etb-v" style="color:var(--cy2)">247</div></div>
+      <div class="etb-s"><div class="etb-l">Closed Today</div><div class="etb-v" style="color:var(--gold)">4</div></div>
+    </div>
+    <div class="filter-row">
+      <button class="fc on" onclick="filt('all',this)">All</button>
+      <button class="fc" onclick="filt('sfr',this)">SFR</button>
+      <button class="fc" onclick="filt('multi',this)">Multifamily</button>
+      <button class="fc" onclick="filt('commercial',this)">Commercial</button>
+      <button class="fc" onclick="filt('land',this)">Land</button>
+      <select class="sort-s" onchange="sortD(this.value)">
+        <option value="new">Newest</option>
+        <option value="price-lo">Price ↑</option>
+        <option value="price-hi">Price ↓</option>
+        <option value="roi">Top ROI</option>
+        <option value="bids">Most Bids</option>
+      </select>
+    </div>
+    <div class="dfeed" id="deal-feed"></div>
+  </div>
+  <div class="ex-r">
+    <div class="of">
+      <div class="of-ttl">Place Order</div>
+      <div class="of-tabs">
+        <button class="of-tab on" onclick="swTab('buy',this)">Buy Order</button>
+        <button class="of-tab" onclick="swTab('sell',this)">List Deal</button>
+      </div>
+      <div id="tab-buy">
+        <div class="fi"><label>Property Type</label><select><option>Any</option><option>SFR</option><option>Multifamily</option><option>Commercial</option><option>Land</option></select></div>
+        <div class="fi-2">
+          <div class="fi"><label>State</label><select><option>Any</option><option>GA</option><option>IL</option><option>TX</option><option>FL</option><option>NC</option><option>TN</option></select></div>
+          <div class="fi"><label>Metro</label><input placeholder="Atlanta"/></div>
+        </div>
+        <div class="fi-2">
+          <div class="fi"><label>Max Price ($)</label><input type="number" placeholder="250000"/></div>
+          <div class="fi"><label>Min ARV ($)</label><input type="number" placeholder="350000"/></div>
+        </div>
+        <div class="fi"><label>Auto-Bid Limit ($)</label><input type="number" placeholder="245000"/></div>
+        <button class="sbtn sbtn-g" onclick="toast('⚡','Standing Order Set','Auto-bidding on matching deals 24/7.')">Set Standing Order</button>
+        <div class="tn">System auto-bids on matching deals. You get notified instantly when matched.</div>
+      </div>
+      <div id="tab-sell" style="display:none">
+        <div class="fi"><label>Address</label><input placeholder="123 Main St"/></div>
+        <div class="fi-2">
+          <div class="fi"><label>City</label><input placeholder="Atlanta"/></div>
+          <div class="fi"><label>State</label><select><option>GA</option><option>IL</option><option>TX</option><option>FL</option><option>NC</option><option>TN</option></select></div>
+        </div>
+        <div class="fi-2">
+          <div class="fi"><label>Ask ($)</label><input type="number" placeholder="89000"/></div>
+          <div class="fi"><label>ARV ($)</label><input type="number" placeholder="165000"/></div>
+        </div>
+        <button class="sbtn sbtn-b" onclick="toast('✅','Listed!','Deal live — buyers being matched now.')">List Deal Free →</button>
+        <div class="tn">Free to list. PropX earns only when your deal closes.</div>
+      </div>
+    </div>
+    <div class="phd"><div class="phd-t">Top Standing Orders</div><div class="phd-v" style="color:var(--pu2)">247</div></div>
+    <div id="standing-orders"></div>
+  </div>
+</div>
+</div>
+
+<div class="view" id="view-buyers">
+<div class="page">
+  <div style="margin-bottom:20px">
+    <div class="ph-lbl">Join the Network</div>
+    <h1 class="ph-title">Apply for <em>Deal Access</em></h1>
+    <p class="ph-sub">PropX sources off-market investment properties nationwide. Verified cash buyers only. Submit your application and receive matched deals directly.</p>
+  </div>
+  <div style="background:var(--bg2);border:1px solid var(--w);padding:26px">
+    <div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--g);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--w)">Your Information</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div class="fi"><label>Full Name</label><input placeholder="James Washington"/></div>
+      <div class="fi"><label>Company Name</label><input placeholder="JW Capital LLC"/></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+      <div class="fi"><label>Email</label><input type="email" placeholder="james@jwcapital.com"/></div>
+      <div class="fi"><label>Phone</label><input placeholder="(404) 555-0142"/></div>
+      <div class="fi"><label>Buyer Type</label><select><option>Fix & Flip</option><option>Buy & Hold</option><option>Developer</option><option>Fund</option></select></div>
+    </div>
+    <div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--g);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--w);margin-top:16px">Your Buy Box</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+      <div class="fi"><label>Max Purchase Price ($)</label><input type="number" placeholder="375000"/></div>
+      <div class="fi"><label>Min ARV ($)</label><input type="number" placeholder="500000"/></div>
+      <div class="fi"><label>Max Rehab ($)</label><input type="number" placeholder="80000"/></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div class="fi"><label>Target States</label><select multiple style="height:80px"><option selected>Georgia</option><option>Illinois</option><option>Texas</option><option>Florida</option><option>North Carolina</option><option>Tennessee</option></select><div style="font-size:8px;color:var(--t3);margin-top:2px">Hold Ctrl to select multiple</div></div>
+      <div class="fi"><label>Specific Cities</label><textarea placeholder="Cook County north of I-55&#10;All of Lake County IL&#10;Atlanta GA" style="background:var(--bg3);border:1px solid var(--w2);color:var(--text);padding:9px 11px;font-family:var(--body);font-size:12px;outline:none;width:100%;height:80px;resize:none;transition:border-color .15s"></textarea></div>
+    </div>
+    <div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--g);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--w);margin-top:16px">Proof of Funds</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div class="fi"><label>Available Funds ($)</label><input type="number" placeholder="500000"/></div>
+      <div class="fi"><label>POF Type</label><select><option>Bank Statement</option><option>Bank Letter</option><option>Hard Money Pre-Approval</option><option>Line of Credit</option></select></div>
+    </div>
+    <div style="border:2px dashed var(--w2);padding:20px;text-align:center;cursor:pointer;margin-bottom:14px" onclick="toast('📎','Upload','POF upload ready in production.')">
+      <div style="font-size:20px;margin-bottom:4px">📄</div>
+      <div style="font-size:11px;font-weight:700;margin-bottom:2px">Upload Proof of Funds</div>
+      <div style="font-size:9px;color:var(--t3)">PDF or image · Encrypted · Verified within 4 hours</div>
+    </div>
+    <div style="background:var(--g4);border:1px solid rgba(0,204,122,.1);padding:12px;margin-bottom:14px;font-size:10px;color:var(--t2);line-height:1.8">
+      ✓ Deals matched to your exact criteria sent instantly<br>
+      ✓ Verified buyers get priority access before unverified<br>
+      ✓ Submit offers directly — EMD wired to title on acceptance<br>
+      ✓ Free to join — no subscription required
+    </div>
+    <button style="width:100%;padding:14px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:none;cursor:pointer;font-family:var(--body);background:var(--g);color:var(--bg)" onclick="toast('✅','Application Submitted','POF under review. You will be notified within 4 hours.')">Submit Application →</button>
+  </div>
+</div>
+</div>
+
+<div class="view" id="view-sellers">
+<div class="page">
+  <div style="margin-bottom:20px">
+    <div class="ph-lbl">Submit Your Property</div>
+    <h1 class="ph-title">Get Your Deal <em>In Front of Buyers</em></h1>
+    <p class="ph-sub">PropX is a direct acquisitions company. We purchase investment properties in all 50 states. Submit below and we respond within 4 hours.</p>
+  </div>
+  <div style="background:var(--bg2);border:1px solid var(--w);padding:26px">
+    <div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--g);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--w)">Property Details</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div class="fi"><label>Property Address</label><input placeholder="123 Main St"/></div>
+      <div class="fi"><label>City</label><input placeholder="Atlanta"/></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+      <div class="fi"><label>State</label><select><option>GA</option><option>IL</option><option>TX</option><option>FL</option><option>NC</option><option>TN</option><option>AL</option><option>CA</option><option>NY</option></select></div>
+      <div class="fi"><label>ZIP</label><input placeholder="30317"/></div>
+      <div class="fi"><label>Property Type</label><select><option>SFR</option><option>Multifamily</option><option>Commercial</option><option>Land</option><option>Industrial</option></select></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+      <div class="fi"><label>Asking Price ($)</label><input type="number" placeholder="89000"/></div>
+      <div class="fi"><label>ARV ($)</label><input type="number" placeholder="165000"/></div>
+      <div class="fi"><label>Est. Rehab ($)</label><input type="number" placeholder="35000"/></div>
+    </div>
+    <div class="fi" style="margin-bottom:10px"><label>Property Description</label><textarea placeholder="Condition, occupancy status, access info..." style="background:var(--bg3);border:1px solid var(--w2);color:var(--text);padding:9px 11px;font-family:var(--body);font-size:12px;outline:none;width:100%;height:80px;resize:none;transition:border-color .15s"></textarea></div>
+    <div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--g);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--w);margin-top:16px">Title Company</div>
+    <div style="background:var(--b4);border:1px solid rgba(0,96,255,.15);padding:10px 12px;margin-bottom:10px;font-size:10px;color:var(--b2);line-height:1.6">Your buyer's EMD will be wired to this title company within 24 hours of signed agreement.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div class="fi"><label>Title Company Name</label><input placeholder="Peachtree Title Group"/></div>
+      <div class="fi"><label>Title Officer Name</label><input placeholder="Sarah Johnson"/></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+      <div class="fi"><label>Title Officer Email</label><input type="email" placeholder="sarah@peachtree.com"/></div>
+      <div class="fi"><label>Title Officer Phone</label><input placeholder="(404) 555-0182"/></div>
+      <div class="fi"><label>Handles Double Closes?</label><select><option value="yes">Yes — confirmed</option><option value="no">No — use yours</option><option value="unknown">Unknown</option></select></div>
+    </div>
+    <div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--g);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--w);margin-top:16px">Your Contact Info</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <div class="fi"><label>Your Name</label><input placeholder="Marcus Robinson"/></div>
+      <div class="fi"><label>Email</label><input type="email" placeholder="marcus@email.com"/></div>
+    </div>
+    <div style="background:var(--g4);border:1px solid rgba(0,204,122,.1);padding:12px;margin-bottom:14px;font-size:10px;color:var(--t2);line-height:1.8">
+      ✓ You receive your full asking price — we do not negotiate you down<br>
+      ✓ EMD wired to your title company within 24 hours of signed agreement<br>
+      ✓ Cash close · 10-21 days · as-is · no contingencies
+    </div>
+    <button style="width:100%;padding:14px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:none;cursor:pointer;font-family:var(--body);background:var(--g);color:var(--bg)" onclick="toast('✅','Submitted!','We received your property. Expect a response within 4 hours.')">Submit Property →</button>
+  </div>
+</div>
+</div>
+
+<div class="mo" id="modal" onclick="if(event.target.id==='modal')closeMo()">
+  <div class="mb"><div class="mh"><div class="mt" id="m-title"></div><button class="mx" onclick="closeMo()">✕</button></div><div class="mbody" id="m-body"></div><div class="mft" id="m-ft"></div></div>
+</div>
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+const fmt=n=>{if(!n&&n!==0)return'—';const a=Math.abs(Math.round(n));const s=n<0?'-':'';if(a>=1e6)return s+'$'+(a/1e6).toFixed(1)+'M';if(a>=1000)return s+'$'+a.toLocaleString();return s+'$'+a;};
+const TICKER=[{m:'ATL-SFR',v:'$103K',c:'+2.1%',up:true},{m:'CHI-SFR',v:'$285K',c:'+1.4%',up:true},{m:'NSV-SFR',v:'$213K',c:'-0.8%',up:false},{m:'TPA-SFR',v:'$236K',c:'+3.2%',up:true},{m:'DAL-MFH',v:'$1.45M',c:'+0.9%',up:true},{m:'CLT-SFR',v:'$84K',c:'+0.4%',up:true},{m:'HTX-SFR',v:'$161K',c:'+1.8%',up:true},{m:'LAK-SFR',v:'$220K',c:'+2.2%',up:true}];
+const DEALS=[
+  {id:1,addr:'4718 Peach St NW',city:'Atlanta, GA',type:'sfr',label:'SFR',ask:103000,arv:165000,rehab:35000,bd:3,ba:2,bids:7,topBid:99000,expiry:6,roi:31,hot:true,isNew:false},
+  {id:2,addr:'3302 Tryon St',city:'Charlotte, NC',type:'sfr',label:'SFR',ask:84000,arv:140000,rehab:28000,bd:3,ba:1,bids:3,topBid:80000,expiry:11,roi:28,hot:false,isNew:true},
+  {id:3,addr:'5590 N Dale Mabry',city:'Tampa, FL',type:'sfr',label:'SFR',ask:236000,arv:310000,rehab:45000,bd:4,ba:3,bids:12,topBid:229000,expiry:12,roi:24,hot:true,isNew:false},
+  {id:4,addr:'8821 Westheimer Rd',city:'Houston, TX',type:'multi',label:'Multifamily',ask:385000,arv:520000,rehab:65000,bd:8,ba:8,bids:5,topBid:370000,expiry:9,roi:35,hot:false,isNew:false},
+  {id:5,addr:'2201 Gallatin Pike',city:'Nashville, TN',type:'sfr',label:'SFR',ask:213000,arv:290000,rehab:42000,bd:3,ba:2,bids:9,topBid:208000,expiry:13,roi:29,hot:true,isNew:true},
+  {id:6,addr:'1204 Lamar Ave',city:'Memphis, TN',type:'sfr',label:'SFR',ask:58000,arv:98000,rehab:22000,bd:3,ba:1,bids:14,topBid:57000,expiry:5,roi:31,hot:true,isNew:false},
+];
+const STANDING=[
+  {name:'Cook Co. Investor',criteria:'SFR · Cook County IL · <$375K',max:375000,auto:true,matched:2},
+  {name:'James W.',criteria:'SFR · Atlanta · <$150K · ARV>$200K',max:145000,auto:true,matched:3},
+  {name:'Sandra B.',criteria:'Multi · Houston · <$500K',max:480000,auto:true,matched:2},
+  {name:'Greg H.',criteria:'Any · Tampa · <$300K',max:290000,auto:false,matched:1},
+];
+const TRADES=[
+  {addr:'4901 Yale St',city:'Houston TX',price:162000,ago:'2h ago'},
+  {addr:'8200 Bryan Dairy',city:'Tampa FL',price:445000,ago:'5h ago'},
+  {addr:'3811 Peachtree',city:'Atlanta GA',price:98000,ago:'Yesterday'},
+  {addr:'1402 S Lamar',city:'Dallas TX',price:187000,ago:'2 days ago'},
+];
+let activeFilter='all';
+function renderTicker(){const t=document.getElementById('ticker');if(!t)return;const h=TICKER.map(d=>`<div class="ti"><span class="ti-m">${d.m}</span><span class="ti-v ${d.up?'up':'dn'}">${d.v}</span><span class="${d.up?'up':'dn'}">${d.c}</span></div>`).join('');t.innerHTML=h+h;}
+function renderOB(){
+  const asks=document.getElementById('ob-asks');const bids=document.getElementById('ob-bids');if(!asks||!bids)return;
+  const ad=[{p:385000,m:'HTX-MF',s:'1 deal',pct:45},{p:236000,m:'TPA-SFR',s:'1 deal',pct:70},{p:213000,m:'NSV-SFR',s:'1 deal',pct:80},{p:103000,m:'ATL-SFR',s:'1 deal',pct:90},{p:84000,m:'CLT-SFR',s:'1 deal',pct:85}];
+  const bd=[{p:375000,m:'Cook Co',s:'Auto',pct:90},{p:290000,m:'TPA',s:'Greg H.',pct:75},{p:145000,m:'ATL',s:'James W.',pct:80},{p:480000,m:'HTX',s:'Sandra B.',pct:65},{p:208000,m:'NSV',s:'Manual',pct:55}];
+  asks.innerHTML=ad.map(a=>`<div class="ob-row ob-ask"><div class="ob-bg" style="width:${a.pct}%"></div><div class="ob-p">${fmt(a.p)}</div><div class="ob-m">${a.m}</div><div class="ob-s">${a.s}</div></div>`).join('');
+  bids.innerHTML=bd.map(b=>`<div class="ob-row ob-bid"><div class="ob-bg" style="width:${b.pct}%"></div><div class="ob-p">${fmt(b.p)}</div><div class="ob-m">${b.m}</div><div class="ob-s">${b.s}</div></div>`).join('');
+}
+function renderDeals(f='all'){
+  const feed=document.getElementById('deal-feed');if(!feed)return;
+  const filtered=f==='all'?DEALS:DEALS.filter(d=>d.type===f);
+  const TYPE_TAGS={sfr:'tg',multi:'tp',commercial:'tc',land:'tgo'};
+  feed.innerHTML=filtered.map(d=>{
+    const maxP=d.arv-d.rehab-d.ask;const bPct=Math.min((d.topBid/d.ask)*100,100);const tc=TYPE_TAGS[d.type]||'tgr';
+    return`<div class="dcard ${d.hot?'hot':''} ${d.isNew?'isnew':''}" onclick="openDeal(${d.id})">
+      <div class="dc-acc" style="background:${d.hot?'var(--gold)':d.isNew?'var(--g)':'transparent'}"></div>
+      <div class="dc-top">
+        <div>
+          <div class="dc-tags"><span class="tag ${tc}">${d.label}</span>${d.hot?'<span class="tag tgo">Hot</span>':''}${d.isNew?'<span class="tag tg">New</span>':''}</div>
+          <div class="dc-addr">${d.addr}</div>
+          <div class="dc-city">${d.city} · ${d.bd}bd/${d.ba}ba</div>
+        </div>
+        <div class="dc-pr"><div class="dc-price-lbl">Ask Price</div><div class="dc-price">${fmt(d.ask)}</div><div class="dc-roi">${d.roi}% max ROI</div></div>
+      </div>
+      <div class="dc-nums" style="grid-template-columns:repeat(4,1fr)">
+        <div class="dn"><div class="dn-l">ARV</div><div class="dn-v up">${fmt(d.arv)}</div></div>
+        <div class="dn"><div class="dn-l">Rehab</div><div class="dn-v">${fmt(d.rehab)}</div></div>
+        <div class="dn"><div class="dn-l">Max Profit</div><div class="dn-v" style="color:${maxP>0?'var(--g)':'var(--r)'}">${fmt(maxP)}</div></div>
+        <div class="dn"><div class="dn-l">Top Bid</div><div class="dn-v" style="color:var(--gold)">${fmt(d.topBid)}</div></div>
+      </div>
+      <div class="bid-prog"><div class="bid-fill" style="width:${bPct}%"></div></div>
+      <div class="dc-bot">
+        <div class="dc-bids"><div class="biddot"></div>${d.bids} bids · top ${fmt(d.topBid)}</div>
+        <div class="dc-timer">⏱ ${d.expiry}d left</div>
+        <div class="dc-btns">
+          <button class="dcb dcb-w" onclick="event.stopPropagation();toast('👁','Watching','Alert set for '+${JSON.stringify(d.addr)})">Watch</button>
+          <button class="dcb dcb-bid" onclick="event.stopPropagation();openBid(${d.id})">⚡ Bid</button>
+        </div>
+      </div>
+    </div>`;}).join('');
+}
+function filt(f,btn){document.querySelectorAll('.fc').forEach(c=>c.classList.remove('on'));btn.classList.add('on');activeFilter=f;renderDeals(f);}
+function sortD(v){if(v==='price-lo')DEALS.sort((a,b)=>a.ask-b.ask);else if(v==='price-hi')DEALS.sort((a,b)=>b.ask-a.ask);else if(v==='roi')DEALS.sort((a,b)=>b.roi-a.roi);else if(v==='bids')DEALS.sort((a,b)=>b.bids-a.bids);renderDeals(activeFilter);}
+function renderSO(){const el=document.getElementById('standing-orders');if(!el)return;el.innerHTML=STANDING.map(o=>`<div class="so-item"><div class="soi-main"><div class="soi-name">${o.name}</div><div class="soi-crit">${o.criteria}</div><div style="margin-top:4px"><span class="tag ${o.auto?'tg':'tb'}">${o.auto?'⚡ Auto':'Manual'}</span> <span class="tag tgr">${o.matched} matched</span></div></div><div><div class="soi-price">${fmt(o.max)}</div><div style="font-size:7px;color:var(--t3);text-align:right">max bid</div></div></div>`).join('');}
+function renderRT(){const el=document.getElementById('rt-feed');if(!el)return;el.innerHTML=TRADES.map(t=>`<div class="rt-item"><div class="rt-dot" style="background:var(--g)"></div><div class="rt-addr">${t.addr}, ${t.city}</div><div><div class="rt-p up">${fmt(t.price)}</div><div class="rt-t">${t.ago}</div></div></div>`).join('');}
+function openDeal(id){const d=DEALS.find(x=>x.id===id);if(!d)return;const maxP=d.arv-d.rehab-d.ask;document.getElementById('m-title').textContent=d.addr;document.getElementById('m-body').innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--w);border:1px solid var(--w);margin-bottom:12px">${[['Ask',fmt(d.ask),'var(--g)'],['ARV',fmt(d.arv),''],['Max Profit',fmt(maxP),'var(--g)'],['Rehab',fmt(d.rehab),''],['Bids',d.bids,'var(--gold2)'],['Expires',d.expiry+'d','']].map(([l,v,c])=>`<div style="background:var(--bg3);padding:10px"><div style="font-size:7px;color:var(--t3);margin-bottom:2px;font-weight:700;letter-spacing:1px;text-transform:uppercase">${l}</div><div style="font-family:var(--mono);font-size:14px;font-weight:700;color:${c||'var(--text)'}">${v}</div></div>`).join('')}</div>`;document.getElementById('m-ft').innerHTML=`<button class="mbtn mbtn-o" onclick="closeMo()">Close</button><button class="mbtn mbtn-g" onclick="closeMo();openBid(${id})">⚡ Bid Now</button>`;document.getElementById('modal').classList.add('on');}
+function openBid(id){const d=DEALS.find(x=>x.id===id);if(!d)return;document.getElementById('m-title').textContent='Place Bid — '+d.addr;document.getElementById('m-body').innerHTML=`<div style="margin-bottom:12px;padding:12px;background:var(--bg3);border:1px solid var(--w);font-size:11px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:var(--t3)">Ask Price</span><span class="mono">${fmt(d.ask)}</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--t3)">Top Bid</span><span class="mono" style="color:var(--gold)">${fmt(d.topBid)}</span></div></div><div style="font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-bottom:5px">Your Bid</div><input class="bid-inp" type="number" id="bid-amt" value="${d.topBid+1000}"/><div style="font-size:9px;color:var(--t3);margin-bottom:10px">Cash buyer only. EMD required within 24hrs of acceptance.</div>`;document.getElementById('m-ft').innerHTML=`<button class="mbtn mbtn-o" onclick="closeMo()">Cancel</button><button class="mbtn mbtn-g" onclick="submitBid(${id})">⚡ Submit Bid</button>`;document.getElementById('modal').classList.add('on');}
+function submitBid(id){const amt=document.getElementById('bid-amt')?.value;const d=DEALS.find(x=>x.id===id);closeMo();toast('⚡','Bid Submitted',`${fmt(parseInt(amt))} on ${d?.addr}. You will be notified if accepted.`);if(d){d.bids++;d.topBid=parseInt(amt)||d.topBid;renderDeals(activeFilter);}}
+function swTab(tab,btn){document.querySelectorAll('.of-tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');document.getElementById('tab-buy').style.display=tab==='buy'?'block':'none';document.getElementById('tab-sell').style.display=tab==='sell'?'block':'none';}
+function show(id){document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));document.querySelectorAll('.nt').forEach(n=>n.classList.remove('on'));document.getElementById('view-'+id).classList.add('on');const map={exchange:0,buyers:1,sellers:2};if(map[id]!==undefined)document.querySelectorAll('.nt')[map[id]]?.classList.add('on');window.scrollTo(0,0);}
+function closeMo(){document.getElementById('modal').classList.remove('on');}
+function toast(icon,title,msg){const w=document.getElementById('toasts');const t=document.createElement('div');t.className='toast';t.innerHTML=`<div class="ti">${icon}</div><div><div class="tt">${title}</div><div class="tm">${msg}</div></div>`;w.appendChild(t);setTimeout(()=>{t.style.cssText='opacity:0;transform:translateX(10px);transition:all .25s';setTimeout(()=>t.remove(),250);},4500);}
+renderTicker();renderOB();renderDeals();renderSO();renderRT();
+setInterval(()=>{const d=DEALS[Math.floor(Math.random()*DEALS.length)];d.bids+=1;d.topBid=Math.round(d.topBid*1.005);renderDeals(activeFilter);renderOB();},9000);
+setTimeout(()=>toast('🔔','New Deal','Cook County SFR just submitted — matching to Illinois buyer now.'),3000);
+setTimeout(()=>toast('⚡','Bid Accepted','James W. accepted $103K on Atlanta SFR.'),8000);
+</script>
+</body>
+</html>
