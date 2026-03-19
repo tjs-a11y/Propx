@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PropX — Launch Ready Pages</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Unbounded:wght@400;700;900&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#03050a;--bg2:#060c14;--bg3:#091018;--bg4:#0d1622;
+  --w:rgba(255,255,255,0.05);--w2:rgba(255,255,255,0.09);--w3:rgba(255,255,255,0.16);
+  --g:#00cc7a;--g2:#00ff99;--g3:rgba(0,204,122,0.1);--g4:rgba(0,204,122,0.05);
+  --r:#ff2d55;--r2:#ff6b80;--r3:rgba(255,45,85,0.1);
+  --b:#0060ff;--b2:#4d90ff;--b3:rgba(0,96,255,0.1);--b4:rgba(0,96,255,0.05);
+  --gold:#f0a500;--gold2:#ffc444;--gold3:rgba(240,165,0,0.1);--gold4:rgba(240,165,0,0.05);
+  --text:#dce8f5;--t2:rgba(220,232,245,0.5);--t3:rgba(220,232,245,0.24);--t4:rgba(220,232,245,0.07);
+  --mono:'Space Mono',monospace;--disp:'Unbounded',sans-serif;--body:'Manrope',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--body);overflow-x:hidden;}
+::-webkit-scrollbar{width:2px;}::-webkit-scrollbar-thumb{background:var(--g);}
+nav{position:fixed;top:0;width:100%;z-index:500;height:52px;display:flex;align-items:center;background:rgba(3,5,10,.98);border-bottom:1px solid var(--w2);backdrop-filter:blur(24px);}
+.nl{padding:0 18px;border-right:1px solid var(--w);height:100%;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.nlb{font-family:var(--disp);font-size:17px;font-weight:900;letter-spacing:-1px;}
+.nlb span{color:var(--g);}
+.nl-s{font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t3);}
+.ntabs{display:flex;height:100%;overflow-x:auto;flex:1;}
+.nt{padding:0 14px;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);cursor:pointer;border:none;background:transparent;font-family:var(--body);border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:5px;height:100%;}
+.nt:hover{color:var(--t2);}
+.nt.on{color:var(--g);border-bottom-color:var(--g);}
+.view{display:none;padding-top:52px;min-height:100vh;}
+.view.on{display:block;}
+.page{padding:22px;max-width:900px;margin:0 auto;}
+.ph{margin-bottom:20px;}
+.ph-lbl{font-size:8px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--g);margin-bottom:4px;}
+.ph-title{font-family:var(--disp);font-size:clamp(20px,2.8vw,32px);font-weight:900;letter-spacing:-1px;line-height:1.05;}
+.ph-title em{font-style:normal;color:var(--g);}
+.ph-sub{font-size:12px;color:var(--t2);margin-top:4px;line-height:1.7;}
+.btn{padding:8px 18px;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;border:none;cursor:pointer;font-family:var(--body);transition:all .15s;}
+.btn-g{background:var(--g);color:var(--bg);}
+.btn-g:hover{background:var(--g2);}
+.btn-o{background:transparent;border:1px solid var(--w2);color:var(--t2);}
+.btn-o:hover{border-color:var(--g);color:var(--g);}
+.btn-sm{padding:5px 11px;font-size:8px;}
+.fi{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+.fi label{font-size:7px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);}
+.fi input,.fi select{background:var(--bg3);border:1px solid var(--w2);color:var(--text);padding:10px 12px;font-family:var(--mono);font-size:14px;outline:none;transition:border-color .15s;width:100%;}
+.fi input:focus,.fi select:focus{border-color:rgba(0,204,122,.4);}
+.fi input::placeholder{color:var(--t3);}
+.fi select option{background:var(--bg2);}
+.fi-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.fi-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.sec-lbl{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--g);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--w);}
+.tag{display:inline-flex;align-items:center;gap:2px;padding:2px 7px;font-size:7px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+.tg{background:var(--g3);color:var(--g);border:1px solid rgba(0,204,122,.2);}
+.tr{background:var(--r3);color:var(--r2);border:1px solid rgba(255,45,85,.2);}
+.tgo{background:var(--gold3);color:var(--gold2);border:1px solid rgba(240,165,0,.2);}
+.mono{font-family:var(--mono);}
+.toast-wrap{position:fixed;bottom:14px;right:14px;z-index:9999;display:flex;flex-direction:column;gap:5px;pointer-events:none;}
+.toast{background:var(--bg2);border:1px solid var(--w2);padding:9px 13px;min-width:260px;max-width:360px;display:flex;align-items:flex-start;gap:7px;pointer-events:all;box-shadow:0 12px 40px rgba(0,0,0,.8);animation:tIn .2s ease-out;}
+@keyframes tIn{from{opacity:0;transform:translateX(10px);}to{opacity:1;transform:translateX(0);}}
+.ti{font-size:13px;flex-shrink:0;}
+.tt{font-size:10px;font-weight:700;margin-bottom:1px;}
+.tm{font-size:9px;color:var(--t2);line-height:1.4;}
+@media(max-width:600px){.fi-2,.fi-3{grid-template-columns:1fr;}.page{padding:14px;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nl"><div><div class="nlb">Prop<span>X</span></div><div class="nl-s">Launch Kit</div></div></div>
+  <div class="ntabs">
+    <button class="nt on" onclick="show('calc')">📱 Quick Calculator</button>
+    <button class="nt" onclick="show('alert')">📧 Deal Alert Email</button>
+    <button class="nt" onclick="show('nda')">📋 NDA / Non-Circ</button>
+    <button class="nt" onclick="show('confirm')">✅ Confirmations</button>
+    <button class="nt" onclick="show('offer')">💰 Offer Form</button>
+    <button class="nt" onclick="show('faq')">❓ FAQ</button>
+    <button class="nt" onclick="show('contact')">📞 Contact</button>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════
+  MOBILE QUICK PROFIT CALCULATOR
+  Use this when a wholesaler texts you a deal
+══════════════════════════════════════ -->
+<div class="view on" id="view-calc">
+<div class="page" style="max-width:520px">
+  <div class="ph">
+    <div class="ph-lbl">Quick Deal Check</div>
+    <h1 class="ph-title">Profit <em>Calculator</em></h1>
+    <p class="ph-sub">Wholesaler just texted you a deal. Punch in the numbers. Know your list price and net profit in seconds. Use this on your phone.</p>
+  </div>
+
+  <div style="background:var(--bg2);border:1px solid var(--w);padding:22px;margin-bottom:14px">
+    <div class="sec-lbl">Deal Numbers</div>
+    <div class="fi"><label>Wholesaler Ask ($)</label>
+      <input id="c-ask" type="number" placeholder="449000" oninput="calc()" inputmode="numeric"/>
+    </div>
+    <div class="fi-2" style="margin-bottom:0">
+      <div class="fi"><label>ARV ($)</label><input id="c-arv" type="number" placeholder="730000" oninput="calc()" inputmode="numeric"/></div>
+      <div class="fi"><label>Est. Rehab ($)</label><input id="c-rehab" type="number" placeholder="100000" oninput="calc()" inputmode="numeric"/></div>
+    </div>
+    <div class="fi-2" style="margin-bottom:0">
+      <div class="fi"><label>Property Type</label>
+        <select id="c-type" onchange="calc()">
+          <option value="sfr">SFR</option>
+          <option value="multi">Multifamily</option>
+          <option value="commercial">Commercial</option>
+          <option value="land">Land</option>
+        </select>
+      </div>
+      <div class="fi"><label>Your Spread %</label>
+        <input id="c-spread" type="number" value="12" oninput="calc()" inputmode="numeric"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIVE RESULTS -->
+  <div style="background:var(--bg2);border:1px solid var(--w);overflow:hidden;margin-bottom:14px" id="results-box">
+    <div style="padding:14px 18px;border-bottom:1px solid var(--w);display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t3)">Your List Price</div>
+      <div style="font-family:var(--disp);font-size:28px;font-weight:700;color:var(--g)" id="r-list">—</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--w)">
+      <div style="background:var(--bg2);padding:12px 16px">
+        <div style="font-size:7px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-bottom:3px">Your Floor (min offer)</div>
+        <div style="font-family:var(--mono);font-size:16px;font-weight:700" id="r-floor">—</div>
+      </div>
+      <div style="background:var(--bg2);padding:12px 16px">
+        <div style="font-size:7px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-bottom:3px">Your Net Profit</div>
+        <div style="font-family:var(--mono);font-size:16px;font-weight:700" id="r-net">—</div>
+      </div>
+      <div style="background:var(--bg2);padding:12px 16px">
+        <div style="font-size:7px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-bottom:3px">T-Fund Cost</div>
+        <div style="font-family:var(--mono);font-size:14px" id="r-tf">—</div>
+      </div>
+      <div style="background:var(--bg2);padding:12px 16px">
+        <div style="font-size:7px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-bottom:3px">Ask / ARV Ratio</div>
+        <div style="font-family:var(--mono);font-size:14px" id="r-ratio">—</div>
+      </div>
+      <div style="background:var(--bg2);padding:12px 16px">
+        <div style="font-size:7px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-bottom:3px">Buyer Max Profit</div>
+        <div style="font-family:var(--mono);font-size:14px" id="r-buyerprofit">—</div>
+      </div>
+      <div style="background:var(--bg2);padding:12px 16px">
+        <div style="font-size:7px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-bottom:3px">Deal Grade</div>
+        <div style="font-size:18px;font-weight:700" id="r-grade">—</div>
+      </div>
+    </div>
+
+    <!-- VERDICT -->
+    <div id="r-verdict" style="padding:14px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <div style="font-size:12px;color:var(--t3)">Enter numbers above to see verdict</div>
+    </div>
+
+    <!-- DEAL TYPE RECOMMENDATION -->
+    <div id="r-mode" style="padding:12px 18px;border-top:1px solid var(--w);font-size:10px;color:var(--t3)">
+      Enter numbers to see recommended deal mode
+    </div>
+  </div>
+
+  <!-- QUICK REPLY TO WHOLESALER -->
+  <div style="background:var(--bg2);border:1px solid var(--w);padding:18px" id="reply-box">
+    <div class="sec-lbl">Quick Reply to Wholesaler</div>
+    <div style="background:var(--bg3);border:1px solid var(--w2);padding:14px;font-size:12px;line-height:1.9;color:var(--t2);margin-bottom:10px;font-family:var(--body)" id="reply-text">
+      Enter deal numbers to generate your reply
+    </div>
+    <button class="btn btn-g" style="width:100%" onclick="copyReply()">📋 Copy Reply</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════
+  DEAL ALERT EMAIL TEMPLATE
+  What buyers receive when a deal hits
+══════════════════════════════════════ -->
+<div class="view" id="view-alert">
+<div class="page">
+  <div class="ph">
+    <div class="ph-lbl">Automated Buyer Email</div>
+    <h1 class="ph-title">Deal Alert <em>Template</em></h1>
+    <p class="ph-sub">This is the exact email your registered buyers receive the moment a deal matches their buy box. Professional, urgent, no fluff. Drives action.</p>
+  </div>
+
+  <!-- PREVIEW -->
+  <div style="background:var(--bg2);border:1px solid var(--w);overflow:hidden;margin-bottom:14px">
+    <!-- EMAIL CLIENT CHROME -->
+    <div style="background:var(--bg3);padding:10px 14px;border-bottom:1px solid var(--w);display:flex;gap:5px">
+      <div style="width:9px;height:9px;border-radius:50%;background:#ef4444"></div>
+      <div style="width:9px;height:9px;border-radius:50%;background:#f59e0b;margin-left:3px"></div>
+      <div style="width:9px;height:9px;border-radius:50%;background:#22c55e;margin-left:3px"></div>
+    </div>
+    <div style="padding:8px 14px;border-bottom:1px solid var(--w);font-size:9px;display:flex;gap:8px">
+      <span style="color:var(--t3);width:52px;flex-shrink:0">FROM</span>
+      <span style="font-family:var(--mono);font-size:10px;color:var(--t2)">deals@propx.io — PropX Acquisitions</span>
+    </div>
+    <div style="padding:8px 14px;border-bottom:1px solid var(--w);font-size:9px;display:flex;gap:8px">
+      <span style="color:var(--t3);width:52px;flex-shrink:0">TO</span>
+      <span style="font-family:var(--mono);font-size:10px;color:var(--t2)">[Buyer First Name] — PropX Verified Buyer List</span>
+    </div>
+    <div style="padding:8px 14px;border-bottom:1px solid var(--w);font-size:9px;display:flex;gap:8px">
+      <span style="color:var(--t3);width:52px;flex-shrink:0">SUBJECT</span>
+      <span style="font-family:var(--mono);font-size:10px;color:var(--gold2)">⚡ New Deal — Kirkwood Atlanta · 3/2 · ARV $730K · Closes 4/1 · Cash Only</span>
+    </div>
+    <!-- EMAIL BODY -->
+    <div style="padding:24px 28px;font-size:13px;line-height:1.9;color:var(--t2);max-width:600px">
+      <p style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--g);margin-bottom:16px">PropX — New Deal Alert</p>
+      <p style="margin-bottom:16px">Hi <strong style="color:var(--text)">[First Name]</strong>,</p>
+      <p style="margin-bottom:16px">A new deal just hit our system that matches your buy box. Details below — this one moves fast.</p>
+
+      <!-- DEAL CARD IN EMAIL -->
+      <div style="background:var(--bg3);border:1px solid var(--w2);padding:18px;margin-bottom:18px">
+        <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px">Kirkwood, Atlanta GA 30317</div>
+        <div style="font-size:10px;color:var(--t3);margin-bottom:14px">Single Family · 3 bed / 2 bath · 1,410 sqft · 8,712 sqft lot · Built 1965</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--w);margin-bottom:14px">
+          <div style="background:var(--bg2);padding:10px 12px">
+            <div style="font-size:7px;color:var(--t3);margin-bottom:3px;font-weight:700;letter-spacing:1px;text-transform:uppercase">Price</div>
+            <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--g)">$503,000</div>
+          </div>
+          <div style="background:var(--bg2);padding:10px 12px">
+            <div style="font-size:7px;color:var(--t3);margin-bottom:3px;font-weight:700;letter-spacing:1px;text-transform:uppercase">ARV</div>
+            <div style="font-family:var(--mono);font-size:16px;font-weight:700">$730,000</div>
+          </div>
+          <div style="background:var(--bg2);padding:10px 12px">
+            <div style="font-size:7px;color:var(--t3);margin-bottom:3px;font-weight:700;letter-spacing:1px;text-transform:uppercase">Max Profit</div>
+            <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--gold2)">$127,000+</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--t2);line-height:1.7;margin-bottom:14px">
+          Already gutted — full rehab needed. Vacant and delivered vacant at closing. Kirkwood is one of Atlanta's strongest appreciating Intown submarkets. Recent comps support $730K ARV on a finished product.
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+          <span class="tag tg">Vacant</span>
+          <span class="tag tgo">Closes 4/1/2026</span>
+          <span class="tag tr">Cash / Hard Money Only</span>
+          <span class="tag tr">No DD Contingency</span>
+        </div>
+        <div style="background:var(--g);padding:12px;text-align:center;cursor:pointer" onclick="toast('⚡','','Submit offer button clicked — connects to offer form in production.')">
+          <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--bg)">Submit Your Offer Now →</span>
+        </div>
+      </div>
+
+      <p style="margin-bottom:8px;font-size:12px">To submit an offer or request a walkthrough, reply to this email or visit:</p>
+      <p style="font-family:var(--mono);font-size:11px;color:var(--g);margin-bottom:18px">propx.io/offers</p>
+      <p style="font-size:11px;color:var(--t3);margin-bottom:4px">This deal was sent to you because it matches your buy box criteria. To update your criteria or unsubscribe, reply to this email.</p>
+      <p style="font-size:11px;color:var(--t3)">PropX Acquisitions · deals@propx.io · (888) 335-2569</p>
+    </div>
+  </div>
+
+  <!-- SUBJECT LINE FORMULAS -->
+  <div style="background:var(--bg2);border:1px solid var(--w);padding:18px;margin-bottom:14px">
+    <div class="sec-lbl">Subject Line Formulas — Proven High Open Rate</div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      ${[
+        {sub:'⚡ New Deal — Kirkwood Atlanta · 3/2 · ARV $730K · Closes 4/1 · Cash Only',note:'Best for urgent deals — specific neighborhood + ARV + deadline'},
+        {sub:'[First Name] — off-market Intown Atlanta · thought of you',note:'Best for warm list — personal feel, highest open rate'},
+        {sub:'Something came across my desk in Kirkwood — wanted you to see it first',note:'Best for established buyers — sounds like a personal tip'},
+        {sub:'Gutted 3/2 in Kirkwood · ARV $730K · yours before it hits the market',note:'Best for exclusivity angle — "before it hits the market" drives opens'},
+      ].map(s=>`<div style="padding:10px 12px;background:var(--bg3);border:1px solid var(--w)">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--gold2);margin-bottom:4px">${s.sub}</div>
+        <div style="font-size:9px;color:var(--t3)">${s.note}</div>
+      </div>`).join('')}
+    </div>
+  </div>
+
+  <!-- RULES -->
+  <div style="background:var(--bg2);border:1px solid var(--w);padding:18px">
+    <div class="sec-lbl">Email Rules — What Makes Buyers Open and Act</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      ${[
+        ['Send before 8am or after 6pm','Investors check email early morning and evening. Midday gets buried.'],
+        ['Specific neighborhood in subject','Kirkwood converts better than Atlanta. Buyers know the submarket.'],
+        ['ARV in subject line always','Buyers filter by ARV first. If it is not in the subject they may not open.'],
+        ['One deal per email','Never batch deals. One email per deal creates urgency and focus.'],
+        ['Deadline in subject','Closing date creates urgency. Buyers procrastinate without a date.'],
+        ['Plain text converts better','Heavy HTML emails hit spam. Simple layout like this one works better.'],
+      ].map(([title,desc])=>`<div style="padding:10px 12px;background:var(--bg3);border:1px solid var(--w)">
+        <div style="font-size:11px;font-weight:700;margin-bottom:3px">${title}</div>
+        <div style="font-size:9px;color:var(--t3);line-height:1.5">${desc}</div>
+      </div>`).join('')}
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════
+  NDA / NON-CIRCUMVENTION AGREEMENT
+  Auto-generated when wholesaler submits
+══════════════════════════════════════ -->
+<div class="view" id="view-nda">
+<div class="page">
+  <div class="ph">
+    <div class="ph-lbl">Legal Protection</div>
+    <h1 class="ph-title">Non-Circumvention <em>Agreement</em></h1>
+    <p class="ph-sub">Every wholesaler signs this automatically when they submit a deal. Protects you from being cut out of the transaction. One page. Plain language. Enforceable.</p>
+  </div>
+
+  <div style="background:var(--bg2);border:1px solid var(--w);padding:28px;margin-bottom:14px">
+    <!-- DOCUMENT -->
+    <div style="background:var(--bg3);border:1px solid var(--w2);padding:32px;font-size:12px;line-height:2;color:var(--t2);font-family:var(--body)" id="nda-doc">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-family:var(--disp);font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">NON-CIRCUMVENTION, NON-DISCLOSURE &amp; CONFIDENTIALITY AGREEMENT</div>
+        <div style="font-size:10px;color:var(--t3)">PropX Acquisitions LLC · deals@propx.io</div>
+      </div>
+
+      <p style="margin-bottom:14px">This Non-Circumvention, Non-Disclosure and Confidentiality Agreement (<strong style="color:var(--text)">"Agreement"</strong>) is entered into as of the date of deal submission between <strong style="color:var(--text)">PropX Acquisitions LLC</strong> ("PropX") and the submitting party identified below ("Submitting Party").</p>
+
+      <p style="font-size:11px;font-weight:700;color:var(--g);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">1. Purpose</p>
+      <p style="margin-bottom:14px">The Submitting Party is providing PropX with information about one or more real property opportunities ("Deal(s)") for the purpose of PropX sourcing capital, buyers, or financing for such Deal(s). The parties wish to define the terms under which such information is shared and to protect their respective interests.</p>
+
+      <p style="font-size:11px;font-weight:700;color:var(--g);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">2. Non-Circumvention</p>
+      <p style="margin-bottom:14px">The Submitting Party agrees not to circumvent, avoid, bypass, or obviate PropX's interest in any transaction arising from information submitted through PropX's platform or communicated directly to PropX. The Submitting Party shall not directly contact, solicit, or transact with any buyer, investor, lender, or other party introduced or identified by PropX in connection with any Deal without PropX's prior written consent for a period of <strong style="color:var(--text)">24 months</strong> from the date of submission.</p>
+
+      <p style="font-size:11px;font-weight:700;color:var(--g);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">3. Confidentiality</p>
+      <p style="margin-bottom:14px">Each party agrees to keep confidential all information exchanged in connection with any Deal, including but not limited to buyer identities, offer prices, transaction structures, and closing details. Neither party shall disclose such information to any third party without prior written consent of the other party.</p>
+
+      <p style="font-size:11px;font-weight:700;color:var(--g);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">4. PropX's Role</p>
+      <p style="margin-bottom:14px">The Submitting Party acknowledges that PropX acts as a principal in all transactions — buying and reselling properties independently. The Submitting Party's compensation is their agreed asking price, which PropX agrees to pay in full at closing. The Submitting Party has no claim to any profit, spread, or additional compensation realized by PropX above the agreed purchase price.</p>
+
+      <p style="font-size:11px;font-weight:700;color:var(--g);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">5. Term and Remedies</p>
+      <p style="margin-bottom:14px">This Agreement shall remain in effect for 24 months from the date of execution. In the event of a breach, the non-breaching party shall be entitled to seek injunctive relief and monetary damages including but not limited to lost profits arising from the circumvented transaction.</p>
+
+      <p style="font-size:11px;font-weight:700;color:var(--g);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">6. Governing Law</p>
+      <p style="margin-bottom:24px">This Agreement shall be governed by the laws of the state in which the subject property is located. If multiple properties are involved, the parties agree that Georgia law shall govern unless otherwise specified in writing.</p>
+
+      <!-- SIGNATURE BLOCK -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;border-top:1px solid var(--w2);padding-top:20px">
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--text);margin-bottom:12px">PROPX ACQUISITIONS LLC</div>
+          <div style="border-bottom:1px solid var(--w2);margin-bottom:6px;height:32px"></div>
+          <div style="font-size:9px;color:var(--t3)">Authorized Signature</div>
+          <div style="border-bottom:1px solid var(--w2);margin-top:12px;margin-bottom:6px;height:32px"></div>
+          <div style="font-size:9px;color:var(--t3)">Date</div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--text);margin-bottom:12px">SUBMITTING PARTY</div>
+          <div style="border-bottom:1px solid var(--w2);margin-bottom:6px;height:32px"></div>
+          <div style="font-size:9px;color:var(--t3)">Signature</div>
+          <div style="border-bottom:1px solid var(--w2);margin-top:12px;margin-bottom:6px;height:32px"></div>
+          <div style="font-size:9px;color:var(--t3)">Printed Name &amp; Company</div>
+          <div style="border-bottom:1px solid var(--w2);margin-top:12px;margin-bottom:6px;height:32px"></div>
+          <div style="font-size:9px;color:var(--t3)">Date</div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px;padding:12px;background:var(--g4);border:1px solid rgba(0,204,122,.1);font-size:10px;color:var(--t2);line-height:1.6">
+        By submitting a deal through PropX's platform or via email, the Submitting Party acknowledges they have read, understood, and agreed to the terms of this Agreement. Electronic submission constitutes a binding signature under the Electronic Signatures in Global and National Commerce Act (E-SIGN Act).
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn btn-g" onclick="toast('📋','Copied','NDA copied to clipboard.')">📋 Copy NDA</button>
+      <button class="btn btn-o" onclick="toast('📧','Sent','NDA sent via DocuSign to submitting party.')">📧 Send via DocuSign</button>
+      <button class="btn btn-o" onclick="toast('⬇️','Downloaded','NDA downloaded as PDF.')">⬇️ Download PDF</button>
+    </div>
+  </div>
+
+  <div style="background:var(--bg2);border:1px solid var(--w);padding:18px">
+    <div class="sec-lbl">How This Gets Signed — Automatic Flow</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${[
+        ['Wholesaler hits submit on deal form','Agreement auto-generates with their name, date, and property address pre-filled'],
+        ['DocuSign or HelloSign fires automatically','They receive an email with the agreement to sign — takes 60 seconds'],
+        ['They sign electronically','Binding under the E-SIGN Act. No wet signature needed.'],
+        ['Signed copy stored in your dashboard','Both parties get a copy. You never chase paper.'],
+        ['Deal only enters your pipeline after signature','System holds the deal until NDA is signed. No signature, no deal processing.'],
+      ].map(([step,desc])=>`<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--w)">
+        <div style="font-size:11px;color:var(--g);flex-shrink:0">→</div>
+        <div><div style="font-size:11px;font-weight:700;margin-bottom:1px">${step}</div><div style="font-size:9px;color:var(--t3);line-height:1.5">${desc}</div></div>
+      </div>`).join('')}
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════
+  CONFIRMATION EMAILS
+  What both sides receive after submitting
+══════════════════════════════════════ -->
+<div class="view" id="view-confirm">
+<div class="page">
+  <div class="ph">
+    <div class="ph-lbl">Automated Confirmations</div>
+    <h1 class="ph-title">Submission <em>Confirmations</em></h1>
+    <p class="ph-sub">Every wholesaler and buyer gets an immediate confirmation after submitting. Without this they think the form broke and submit again — or worse, they walk.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+    <!-- WHOLESALER CONFIRMATION -->
+    <div>
+      <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--b2);margin-bottom:10px">Wholesaler / Seller Confirmation</div>
+      <div style="background:var(--bg2);border:1px solid var(--w);overflow:hidden">
+        <div style="background:var(--bg3);padding:8px 12px;border-bottom:1px solid var(--w);display:flex;gap:4px">
+          <div style="width:8px;height:8px;border-radius:50%;background:#ef4444"></div>
+          <div style="width:8px;height:8px;border-radius:50%;background:#f59e0b;margin-left:3px"></div>
+          <div style="width:8px;height:8px;border-radius:50%;background:#22c55e;margin-left:3px"></div>
+        </div>
+        <div style="padding:6px 12px;border-bottom:1px solid var(--w);font-size:9px;display:flex;gap:6px">
+          <span style="color:var(--t3);width:44px">FROM</span>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--t2)">deals@propx.io</span>
+        </div>
+        <div style="padding:6px 12px;border-bottom:1px solid var(--w);font-size:9px;display:flex;gap:6px">
+          <span style="color:var(--t3);width:44px">SUBJECT</span>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--gold2)">We received your property — PropX Acquisitions</span>
+        </div>
+        <div style="padding:16px;font-size:11px;line-height:1.9;color:var(--t2)">
+          Hi <strong style="color:var(--text)">[Name]</strong>,<br><br>
+          We received your submission for <strong style="color:var(--text)">[Address]</strong>. Our acquisitions team is reviewing it now.<br><br>
+          <strong style="color:var(--text)">What happens next:</strong><br>
+          → We review your numbers within 4 hours<br>
+          → If we move forward, we'll send a purchase agreement for your review<br>
+          → EMD wired to your title company within 24 hours of signing<br><br>
+          If we have any questions we'll reach out to you directly at this email or by phone.<br><br>
+          Questions? Reply to this email anytime.<br><br>
+          <strong style="color:var(--text)">PropX Acquisitions</strong><br>
+          <span style="color:var(--g)">deals@propx.io · (888) 335-2569</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BUYER CONFIRMATION -->
+    <div>
+      <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--g);margin-bottom:10px">Buyer Application Confirmation</div>
+      <div style="background:var(--bg2);border:1px solid var(--w);overflow:hidden">
+        <div style="background:var(--bg3);padding:8px 12px;border-bottom:1px solid var(--w);display:flex;gap:4px">
+          <div style="width:8px;height:8px;border-radius:50%;background:#ef4444"></div>
+          <div style="width:8px;height:8px;border-radius:50%;background:#f59e0b;margin-left:3px"></div>
+          <div style="width:8px;height:8px;border-radius:50%;background:#22c55e;margin-left:3px"></div>
+        </div>
+        <div style="padding:6px 12px;border-bottom:1px solid var(--w);font-size:9px;display:flex;gap:6px">
+          <span style="color:var(--t3);width:44px">FROM</span>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--t2)">buyers@propx.io</span>
+        </div>
+        <div style="padding:6px 12px;border-bottom:1px solid var(--w);font-size:9px;display:flex;gap:6px">
+          <span style="color:var(--t3);width:44px">SUBJECT</span>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--gold2)">Application received — one step left to unlock deal access</span>
+        </div>
+        <div style="padding:16px;font-size:11px;line-height:1.9;color:var(--t2)">
+          Hi <strong style="color:var(--text)">[Name]</strong>,<br><br>
+          Your buyer application is in. One step remaining before deals hit your inbox — <strong style="color:var(--text)">proof of funds verification.</strong><br><br>
+          If you uploaded your POF document, we're reviewing it now. Typically verified within 4 business hours.<br><br>
+          <strong style="color:var(--text)">Once verified you'll receive:</strong><br>
+          → Instant alerts when deals match your buy box<br>
+          → Priority access before unverified buyers<br>
+          → Direct offer submission links<br><br>
+          Didn't upload POF yet? Reply to this email with your bank statement or approval letter and we'll get you verified today.<br><br>
+          <strong style="color:var(--text)">PropX Acquisitions</strong><br>
+          <span style="color:var(--g)">buyers@propx.io · (888) 335-2569</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════
+  OFFER SUBMISSION FORM
+  Where buyers submit their offer
+══════════════════════════════════════ -->
+<div class="view" id="view-offer">
+<div class="page" style="max-width:680px">
+  <div class="ph">
+    <div class="ph-lbl">Buyer Offer</div>
+    <h1 class="ph-title">Submit Your <em>Offer</em></h1>
+    <p class="ph-sub">Cash or hard money offers only. Accepted offers receive a purchase agreement within 2 hours. EMD due within 24 hours of signing.</p>
+  </div>
+
+  <div style="background:var(--bg2);border:1px solid var(--w);padding:26px">
+    <!-- DEAL SUMMARY (populated from deal data) -->
+    <div style="background:var(--bg3);border:1px solid var(--w2);padding:14px;margin-bottom:20px">
+      <div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t3);margin-bottom:8px">Deal You're Offering On</div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:2px">Kirkwood, Atlanta GA 30317</div>
+      <div style="font-size:10px;color:var(--t3);margin-bottom:10px">3/2 · 1,410 sqft · ARV $730,000 · Closes 4/1/2026</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span class="tag tg">Propx List Price: $503,000</span>
+        <span class="tag tr">Cash / Hard Money Only</span>
+        <span class="tag tgo">Closes 4/1/2026</span>
+      </div>
+    </div>
+
+    <div class="sec-lbl">Your Offer</div>
+    <div class="fi" style="margin-bottom:14px">
+      <label>Your Offer Price ($)</label>
+      <input id="offer-price" type="number" placeholder="503000" inputmode="numeric" style="font-size:22px;padding:14px 16px"/>
+      <div style="font-size:9px;color:var(--t3);margin-top:4px">List price: $503,000 · We respond to all offers within 4 hours</div>
+    </div>
+
+    <div class="fi-2" style="margin-bottom:10px">
+      <div class="fi"><label>Financing Type</label>
+        <select>
+          <option>Cash — bank funds</option>
+          <option>Hard Money — pre-approved</option>
+          <option>Hard Money — need to apply</option>
+          <option>Private Money</option>
+        </select>
+      </div>
+      <div class="fi"><label>Can You Close By 4/1/2026?</label>
+        <select>
+          <option>Yes — confirmed</option>
+          <option>Yes — with a few days flexibility</option>
+          <option>No — need more time</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="fi-2" style="margin-bottom:10px">
+      <div class="fi"><label>Your Full Name</label><input placeholder="James Washington"/></div>
+      <div class="fi"><label>Company / Entity Name</label><input placeholder="JW Capital Investments LLC"/></div>
+    </div>
+    <div class="fi-2" style="margin-bottom:10px">
+      <div class="fi"><label>Email</label><input type="email" placeholder="james@jwcapital.com"/></div>
+      <div class="fi"><label>Phone</label><input placeholder="(404) 555-0142"/></div>
+    </div>
+
+    <div class="fi" style="margin-bottom:10px">
+      <label>Have you purchased and rehabbed in Kirkwood or Intown Atlanta?</label>
+      <select>
+        <option>Yes — multiple deals in Kirkwood / Intown</option>
+        <option>Yes — in Atlanta, not specifically Kirkwood</option>
+        <option>No — first deal in this market</option>
+      </select>
+    </div>
+
+    <div class="fi" style="margin-bottom:14px">
+      <label>POF Verification Status</label>
+      <select>
+        <option>Already submitted — on file with PropX</option>
+        <option>Attaching to this submission</option>
+        <option>Will send separately within 1 hour</option>
+      </select>
+      <div style="font-size:9px;color:var(--t3);margin-top:3px">Offers without verified POF will not be processed. No exceptions.</div>
+    </div>
+
+    <div style="background:var(--g4);border:1px solid rgba(0,204,122,.1);padding:12px;margin-bottom:14px;font-size:10px;color:var(--t2);line-height:1.7">
+      By submitting this offer you agree that:<br>
+      ✓ You are a cash or hard money buyer able to close by the stated date<br>
+      ✓ If accepted, you will wire $5,000 EMD to the closing attorney within 24 hours<br>
+      ✓ This is an as-is purchase — no inspection contingency<br>
+      ✓ You have reviewed PropX's non-circumvention agreement
+    </div>
+
+    <button style="width:100%;padding:14px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:none;cursor:pointer;font-family:var(--body);background:var(--g);color:var(--bg)" onclick="toast('✅','Offer Submitted','Your offer is under review. You will hear back within 4 hours. Keep your phone available.')">Submit Offer →</button>
+  </div>
+</div>
+</div>
+
+<!-- FAQ -->
+<div class="view" id="view-faq">
+<div class="page">
+  <div class="ph">
+    <div class="ph-lbl">Common Questions</div>
+    <h1 class="ph-title">Frequently Asked <em>Questions</em></h1>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+    <div>
+      <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--b2);margin-bottom:12px">For Sellers & Wholesalers</div>
+      <div id="faq-sellers"></div>
+    </div>
+    <div>
+      <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--g);margin-bottom:12px">For Buyers & Investors</div>
+      <div id="faq-buyers"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- CONTACT -->
+<div class="view" id="view-contact">
+<div class="page" style="max-width:680px">
+  <div class="ph">
+    <div class="ph-lbl">Get in Touch</div>
+    <h1 class="ph-title">Contact <em>PropX</em></h1>
+    <p class="ph-sub">Wholesalers, sellers, and buyers all use different channels. Reach out through the right one and we'll respond same day.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--w);border:1px solid var(--w);margin-bottom:20px">
+    ${[
+      {icon:'📥',title:'Submit a Deal',email:'deals@propx.io',note:'Wholesalers and sellers — submit your property here. We respond within 4 hours.',color:'var(--b2)'},
+      {icon:'🏠',title:'Join Buyer List',email:'buyers@propx.io',note:'Investors — apply to receive off-market deals matched to your criteria.',color:'var(--g)'},
+      {icon:'💼',title:'General Inquiries',email:'hello@propx.io',note:'Press, partnerships, and everything else.',color:'var(--gold2)'},
+    ].map(c=>`<div style="background:var(--bg2);padding:22px;text-align:center">
+      <div style="font-size:26px;margin-bottom:10px">${c.icon}</div>
+      <div style="font-size:12px;font-weight:700;margin-bottom:4px;color:${c.color}">${c.title}</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--g);margin-bottom:8px">${c.email}</div>
+      <div style="font-size:10px;color:var(--t3);line-height:1.6">${c.note}</div>
+    </div>`).join('')}
+  </div>
+
+  <div style="background:var(--bg2);border:1px solid var(--w);padding:24px">
+    <div class="sec-lbl">Send a Message</div>
+    <div class="fi-2" style="margin-bottom:10px">
+      <div class="fi"><label>Name</label><input placeholder="Your name"/></div>
+      <div class="fi"><label>Email</label><input type="email" placeholder="your@email.com"/></div>
+    </div>
+    <div class="fi" style="margin-bottom:10px">
+      <label>I am a...</label>
+      <select><option>Wholesaler / Seller</option><option>Buyer / Investor</option><option>Hard Money Lender</option><option>Real Estate Agent</option><option>Other</option></select>
+    </div>
+    <div class="fi" style="margin-bottom:14px">
+      <label>Message</label>
+      <textarea placeholder="Tell us about your deal, your buy box, or your question..." style="background:var(--bg3);border:1px solid var(--w2);color:var(--text);padding:10px 12px;font-family:var(--body);font-size:12px;outline:none;width:100%;resize:vertical;min-height:100px;transition:border-color .15s"></textarea>
+    </div>
+    <button style="width:100%;padding:12px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:none;cursor:pointer;font-family:var(--body);background:var(--g);color:var(--bg)" onclick="toast('✅','Message Sent','We will respond within 4 business hours.')">Send Message →</button>
+  </div>
+</div>
+</div>
+
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+const fmt=n=>{if(!n&&n!==0)return'—';const a=Math.abs(Math.round(n));const s=n<0?'-':'';if(a>=1e6)return s+'$'+(a/1e6).toFixed(2)+'M';if(a>=1000)return s+'$'+a.toLocaleString();return s+'$'+a;};
+
+// ── CALCULATOR ──
+function calc(){
+  const ask=parseFloat(document.getElementById('c-ask').value)||0;
+  const arv=parseFloat(document.getElementById('c-arv').value)||0;
+  const rehab=parseFloat(document.getElementById('c-rehab').value)||0;
+  const spread=parseFloat(document.getElementById('c-spread').value)||12;
+  const type=document.getElementById('c-type').value;
+  if(!ask||!arv){return;}
+  const tfCost=ask*0.015;
+  const closing=type==='commercial'||type==='multi'?ask*0.012+2000:ask*0.008+1800;
+  const buffer=2000;
+  const yourSpread=ask*(spread/100);
+  const listPrice=ask+yourSpread+tfCost+closing+buffer;
+  const roundedList=Math.ceil(listPrice/1000)*1000;
+  const floor=ask+10000+tfCost+closing;
+  const netAtList=roundedList-ask-tfCost-closing-buffer;
+  const buyerMaxProfit=arv-rehab-roundedList;
+  const ratio=((ask/arv)*100).toFixed(1);
+  const grade=netAtList>=30000?'A+':netAtList>=20000?'A':netAtList>=12000?'B':netAtList>=8000?'C':'D';
+  const gc={'A+':'#00ff99','A':'#00cc7a','B':'#f0a500','C':'#fb923c','D':'#ff2d55'};
+  document.getElementById('r-list').textContent=fmt(roundedList);
+  document.getElementById('r-floor').textContent=fmt(Math.ceil(floor/1000)*1000);
+  document.getElementById('r-net').textContent=fmt(netAtList);
+  document.getElementById('r-net').style.color=netAtList>=10000?'#00cc7a':'#ff2d55';
+  document.getElementById('r-tf').textContent=fmt(tfCost);
+  document.getElementById('r-ratio').textContent=ratio+'%';
+  document.getElementById('r-ratio').style.color=ratio<65?'#00cc7a':ratio<75?'#f0a500':'#ff2d55';
+  document.getElementById('r-buyerprofit').textContent=buyerMaxProfit>0?fmt(buyerMaxProfit):'Thin — review';
+  document.getElementById('r-buyerprofit').style.color=buyerMaxProfit>50000?'#00cc7a':buyerMaxProfit>20000?'#f0a500':'#ff2d55';
+  document.getElementById('r-grade').textContent=grade;
+  document.getElementById('r-grade').style.color=gc[grade];
+  const vdict=document.getElementById('r-verdict');
+  const isGood=netAtList>=10000&&buyerMaxProfit>20000;
+  vdict.innerHTML=`
+    <div>
+      <div style="font-size:13px;font-weight:700;color:${isGood?'#00cc7a':'#ff2d55'}">${isGood?'✓ DEAL WORKS — list it':'⚠ Review before committing'}</div>
+      <div style="font-size:10px;color:rgba(220,232,245,.5);margin-top:2px">Your net: ${fmt(netAtList)} · Buyer spread: ${fmt(buyerMaxProfit)} · Ask/ARV: ${ratio}%</div>
+    </div>
+    <span style="background:${isGood?'rgba(0,204,122,.1)':'rgba(255,45,85,.1)'};color:${isGood?'#00cc7a':'#ff2d55'};border:1px solid ${isGood?'rgba(0,204,122,.2)':'rgba(255,45,85,.2)'};padding:4px 10px;font-size:8px;font-weight:700;letter-spacing:.5px;text-transform:uppercase">${grade}-Grade</span>`;
+  const modeEl=document.getElementById('r-mode');
+  const mode=netAtList>30000?'Auction — strong margin, let buyers compete':netAtList>15000?'Fixed Price or Auction — your call':netAtList>8000?'Fixed Price — move fast, margin is tight':'Review — margin may be insufficient';
+  const modeColor=netAtList>30000?'#00cc7a':netAtList>15000?'#f0a500':netAtList>8000?'#fb923c':'#ff2d55';
+  modeEl.innerHTML=`<span style="color:${modeColor};font-weight:700">Recommended mode: ${mode}</span>`;
+  // Update reply
+  const reply=document.getElementById('reply-text');
+  if(reply){reply.innerHTML=`Hey — thanks for sending this over.<br><br>I reviewed the numbers on <strong>[address]</strong>. We're interested. Our offer is <strong>${fmt(roundedList)}</strong> — cash close, as-is, we'll coordinate closing through your title company.<br><br>Can you send over the purchase agreement? We want to move fast on this one.<br><br>[Your name] · PropX Acquisitions · (888) 335-2569`;}
+}
+
+function copyReply(){
+  const el=document.getElementById('reply-text');
+  if(!el)return;
+  navigator.clipboard.writeText(el.innerText).then(()=>toast('📋','Copied','Reply copied to clipboard.'));
+}
+
+// ── FAQ ──
+const FAQS_SELLERS=[
+  {q:'Do you pay my full asking price?',a:'Yes. We make offers at your asking price. We do not negotiate you down. If your numbers work for us, you get what you asked for.'},
+  {q:'How fast do you close?',a:'Typically 10-21 days depending on property type. SFR we can close in as few as 7 days if title is clear.'},
+  {q:'What do you do with the property?',a:'We are an acquisitions company. We purchase, manage, and resell investment properties. We do not disclose our disposition strategy — that is proprietary.'},
+  {q:'Do you need an inspection?',a:'We do our own due diligence review. We do not require a standard buyer inspection contingency.'},
+  {q:'What if my title company cannot meet your timeline?',a:'We have preferred closing attorneys in every market. If needed, we will substitute one and ensure your net proceeds are completely unchanged.'},
+  {q:'When do I receive the earnest money?',a:'EMD is wired to your title company within 24 hours of signed purchase agreement. You do not wait for closing.'},
+];
+const FAQS_BUYERS=[
+  {q:'How do I receive deals?',a:'Once your POF is verified, deals matching your buy box are emailed and texted to you instantly — before unverified buyers see them.'},
+  {q:'Is there a fee to join the buyer list?',a:'No. Joining and receiving deals is completely free. You only transact when you choose to buy.'},
+  {q:'How do I submit an offer?',a:'Every deal email contains a direct offer submission link. You submit your price, confirm financing, and we respond within 4 hours.'},
+  {q:'What happens after my offer is accepted?',a:'You receive a purchase agreement via DocuSign within 2 hours. After signing, you wire your EMD to the closing attorney within 24 hours. Inspection period begins from there.'},
+  {q:'Can I walk through the property before offering?',a:'Yes for most deals. Request a walkthrough through your buyer portal or by replying to the deal email. Access is coordinated within 24 hours.'},
+  {q:'What if I cannot close in time?',a:'Deals have fixed closing dates. If you cannot meet the closing date, do not submit an offer. Failure to close after signing forfeits your EMD.'},
+];
+
+function renderFAQ(data,elId){
+  const el=document.getElementById(elId);if(!el)return;
+  el.innerHTML=data.map((f,i)=>`
+    <div style="border-bottom:1px solid rgba(255,255,255,.05)">
+      <div onclick="toggleFAQ(${elId==='faq-sellers'?0:1},${i})" style="padding:12px 0;cursor:pointer;display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+        <div style="font-size:12px;font-weight:700;color:var(--text);line-height:1.4">${f.q}</div>
+        <div style="font-size:14px;color:var(--t3);flex-shrink:0;margin-top:1px" id="${elId}-arr-${i}">+</div>
+      </div>
+      <div id="${elId}-ans-${i}" style="display:none;padding:0 0 12px;font-size:11px;color:var(--t2);line-height:1.7">${f.a}</div>
+    </div>`).join('');
+}
+
+function toggleFAQ(side,i){
+  const prefix=side===0?'faq-sellers':'faq-buyers';
+  const ans=document.getElementById(`${prefix}-ans-${i}`);
+  const arr=document.getElementById(`${prefix}-arr-${i}`);
+  if(!ans)return;
+  const open=ans.style.display==='block';
+  ans.style.display=open?'none':'block';
+  if(arr)arr.textContent=open?'+':'−';
+}
+
+// ── VIEW SWITCHER ──
+function show(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  document.querySelectorAll('.nt').forEach(n=>n.classList.remove('on'));
+  document.getElementById('view-'+id).classList.add('on');
+  const map={calc:0,alert:1,nda:2,confirm:3,offer:4,faq:5,contact:6};
+  if(map[id]!==undefined)document.querySelectorAll('.nt')[map[id]]?.classList.add('on');
+  window.scrollTo(0,0);
+}
+
+function toast(icon,title,msg){
+  const w=document.getElementById('toasts');const t=document.createElement('div');t.className='toast';
+  t.innerHTML=`<div class="ti">${icon}</div><div><div class="tt">${title}</div><div class="tm">${msg}</div></div>`;
+  w.appendChild(t);setTimeout(()=>{t.style.cssText='opacity:0;transform:translateX(10px);transition:all .25s';setTimeout(()=>t.remove(),250);},4500);
+}
+
+// INIT
+renderFAQ(FAQS_SELLERS,'faq-sellers');
+renderFAQ(FAQS_BUYERS,'faq-buyers');
+
+// Load Kirkwood deal into calculator
+document.getElementById('c-ask').value='449000';
+document.getElementById('c-arv').value='730000';
+document.getElementById('c-rehab').value='100000';
+calc();
+</script>
+</body>
+</html>
