@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PropX — Deal Flow System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Unbounded:wght@400;700;900&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#03050a;--bg2:#060c14;--bg3:#091018;--bg4:#0d1622;
+  --w:rgba(255,255,255,0.05);--w2:rgba(255,255,255,0.09);--w3:rgba(255,255,255,0.16);
+  --g:#00cc7a;--g2:#00ff99;--g3:rgba(0,204,122,0.1);--g4:rgba(0,204,122,0.05);
+  --r:#ff2d55;--r2:#ff6b80;--r3:rgba(255,45,85,0.1);
+  --b:#0060ff;--b2:#4d90ff;--b3:rgba(0,96,255,0.1);--b4:rgba(0,96,255,0.05);
+  --gold:#f0a500;--gold2:#ffc444;--gold3:rgba(240,165,0,0.1);--gold4:rgba(240,165,0,0.05);
+  --pu:#7c3aed;--pu2:#a78bfa;--pu3:rgba(124,58,237,0.1);
+  --cy:#0891b2;--cy2:#22d3ee;--cy3:rgba(8,145,178,0.1);
+  --text:#dce8f5;--t2:rgba(220,232,245,0.5);--t3:rgba(220,232,245,0.24);--t4:rgba(220,232,245,0.07);
+  --mono:'Space Mono',monospace;--disp:'Unbounded',sans-serif;--body:'Manrope',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--body);overflow-x:hidden;}
+::-webkit-scrollbar{width:2px;}::-webkit-scrollbar-thumb{background:var(--g);}
+nav{position:fixed;top:0;width:100%;z-index:500;height:52px;display:flex;align-items:center;background:rgba(3,5,10,.98);border-bottom:1px solid var(--w2);backdrop-filter:blur(24px);}
+.nl{padding:0 18px;border-right:1px solid var(--w);height:100%;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.nlb{font-family:var(--disp);font-size:17px;font-weight:900;letter-spacing:-1px;}
+.nlb span{color:var(--g);}
+.nl-s{font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t3);}
+.ntabs{display:flex;height:100%;overflow-x:auto;flex:1;}
+.nt{padding:0 14px;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);cursor:pointer;border:none;background:transparent;font-family:var(--body);border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:5px;height:100%;}
+.nt:hover{color:var(--t2);}
+.nt.on{color:var(--g);border-bottom-color:var(--g);}
+.nbadge{background:var(--r);color:#fff;font-size:7px;padding:1px 5px;font-weight:800;}
+.nalert{background:var(--gold);color:var(--bg);font-size:7px;padding:1px 5px;font-weight:800;}
+.nav-r{margin-left:auto;padding:0 14px;display:flex;align-items:center;gap:7px;flex-shrink:0;}
+.lp{display:flex;align-items:center;gap:4px;padding:3px 9px;background:var(--g3);border:1px solid rgba(0,204,122,.18);}
+.ldot{width:4px;height:4px;border-radius:50%;background:var(--g);animation:pulse 1.8s infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,204,122,.4);}60%{opacity:.5;box-shadow:0 0 0 4px transparent;}}
+.lt{font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--g);}
+.view{display:none;padding-top:52px;min-height:100vh;}
+.view.on{display:block;}
+.page{padding:22px;max-width:1400px;margin:0 auto;}
+.ph{margin-bottom:18px;}
+.ph-lbl{font-size:8px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--g);margin-bottom:4px;}
+.ph-title{font-family:var(--disp);font-size:clamp(18px,2.5vw,30px);font-weight:900;letter-spacing:-1px;line-height:1.05;}
+.ph-title em{font-style:normal;color:var(--g);}
+.ph-sub{font-size:12px;color:var(--t2);margin-top:4px;line-height:1.7;max-width:600px;}
+.btn{padding:7px 16px;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;border:none;cursor:pointer;font-family:var(--body);transition:all .15s;}
+.btn-g{background:var(--g);color:var(--bg);}
+.btn-g:hover{background:var(--g2);}
+.btn-b{background:var(--b);color:#fff;}
+.btn-gold{background:var(--gold);color:var(--bg);}
+.btn-pu{background:var(--pu);color:#fff;}
+.btn-r{background:var(--r);color:#fff;}
+.btn-o{background:transparent;border:1px solid var(--w2);color:var(--t2);}
+.btn-o:hover{border-color:var(--g);color:var(--g);}
+.btn-sm{padding:4px 10px;font-size:8px;}
+.btn-xs{padding:3px 8px;font-size:7px;}
+.tag{display:inline-flex;align-items:center;gap:2px;padding:2px 7px;font-size:7px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+.tg{background:var(--g3);color:var(--g);border:1px solid rgba(0,204,122,.2);}
+.tr{background:var(--r3);color:var(--r2);border:1px solid rgba(255,45,85,.2);}
+.tb{background:var(--b3);color:var(--b2);border:1px solid rgba(0,96,255,.2);}
+.tgo{background:var(--gold3);color:var(--gold2);border:1px solid rgba(240,165,0,.2);}
+.tp{background:var(--pu3);color:var(--pu2);border:1px solid rgba(124,58,237,.2);}
+.tc{background:var(--cy3);color:var(--cy2);border:1px solid rgba(8,145,178,.2);}
+.tgr{background:var(--t4);color:var(--t3);border:1px solid var(--w);}
+.mono{font-family:var(--mono);}
+.panel{background:var(--bg2);border:1px solid var(--w);}
+.phd{padding:11px 14px;border-bottom:1px solid var(--w);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.phd-t{font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);}
+.pbody{padding:14px;}
+.srow{display:grid;gap:1px;background:var(--w);border:1px solid var(--w);margin-bottom:16px;}
+.sc{background:var(--bg2);padding:12px 14px;}
+.sc-l{font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t3);margin-bottom:3px;}
+.sc-v{font-family:var(--disp);font-size:19px;font-weight:700;line-height:1;}
+.sc-s{font-size:8px;margin-top:2px;}
+.up{color:var(--g);}
+.dn{color:var(--r);}
+.fi{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+.fi label{font-size:7px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);}
+.fi input,.fi select,.fi textarea{background:var(--bg3);border:1px solid var(--w2);color:var(--text);padding:9px 11px;font-family:var(--body);font-size:12px;outline:none;transition:border-color .15s;width:100%;}
+.fi input:focus,.fi select:focus,.fi textarea:focus{border-color:rgba(0,204,122,.4);}
+.fi input::placeholder,.fi textarea::placeholder{color:var(--t3);}
+.fi select option{background:var(--bg2);}
+.fi textarea{resize:vertical;min-height:70px;}
+.fi-hint{font-size:8px;color:var(--t3);margin-top:2px;line-height:1.4;}
+.fi-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.fi-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.sec-lbl{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--g);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--w);}
+.pipeline{display:grid;gap:1px;background:var(--w);}
+.pipe-step{background:var(--bg2);padding:10px 14px;display:flex;align-items:center;gap:10px;position:relative;overflow:hidden;}
+.pipe-step.done{background:rgba(0,204,122,.03);}
+.pipe-step.active{background:rgba(0,204,122,.06);}
+.pipe-accent{position:absolute;left:0;top:0;bottom:0;width:3px;}
+.pipe-info{flex:1;}
+.pipe-name{font-size:11px;font-weight:700;margin-bottom:1px;}
+.pipe-sub{font-size:9px;color:var(--t3);line-height:1.4;}
+.dcard{background:var(--bg2);border:1px solid var(--w);margin-bottom:10px;overflow:hidden;}
+.dc-top{padding:12px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;border-bottom:1px solid var(--w);}
+.dc-addr{font-size:13px;font-weight:700;margin-bottom:2px;}
+.dc-meta{font-size:9px;color:var(--t3);}
+.dc-pr{text-align:right;flex-shrink:0;}
+.dc-price{font-family:var(--disp);font-size:19px;font-weight:700;color:var(--g);line-height:1;}
+.dc-price-lbl{font-size:7px;color:var(--t3);margin-bottom:2px;}
+.dc-nums{display:grid;border-bottom:1px solid var(--w);}
+.dn-cell{padding:9px 12px;border-right:1px solid var(--w);}
+.dn-cell:last-child{border-right:none;}
+.dn-l{font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:2px;}
+.dn-v{font-family:var(--mono);font-size:12px;font-weight:700;}
+.dc-bot{padding:9px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--bg3);}
+.ec{background:var(--bg);border:1px solid var(--w2);}
+.ec-hd{padding:8px 12px;background:var(--bg3);border-bottom:1px solid var(--w);display:flex;gap:5px;}
+.ec-dot{width:8px;height:8px;border-radius:50%;}
+.ec-f{padding:6px 12px;border-bottom:1px solid var(--w);font-size:9px;display:flex;gap:8px;}
+.ec-fl{font-size:7px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);width:52px;flex-shrink:0;margin-top:1px;}
+.ec-fv{font-family:var(--mono);font-size:10px;color:var(--t2);}
+.ec-fv.hi{color:var(--gold2);}
+.ec-body{padding:14px;font-size:11px;line-height:2;color:var(--t2);}
+.ec-body strong{color:var(--text);}
+.ec-body .g{color:var(--g);}
+.ec-body .gold{color:var(--gold2);}
+.ec-ft{padding:9px 12px;border-top:1px solid var(--w);background:var(--bg3);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;}
+.doc-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--w);font-size:11px;}
+.doc-item:last-child{border-bottom:none;}
+.doc-icon{font-size:14px;flex-shrink:0;}
+.showing-card{background:var(--bg2);border:1px solid var(--w);padding:14px 16px;margin-bottom:8px;}
+.sc-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
+.sc-buyer{font-size:12px;font-weight:700;margin-bottom:2px;}
+.sc-deal{font-size:9px;color:var(--t3);}
+.sc-time{font-family:var(--mono);font-size:11px;color:var(--gold2);text-align:right;}
+.sc-auto-note{background:var(--g4);border:1px solid rgba(0,204,122,.1);padding:8px 10px;font-size:9px;color:var(--t2);line-height:1.5;}
+.emd-card{background:var(--bg2);border:1px solid var(--w);padding:14px 16px;margin-bottom:8px;}
+.emd-top{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+.emd-deal{font-size:12px;font-weight:700;margin-bottom:2px;}
+.emd-meta{font-size:9px;color:var(--t3);}
+.emd-amount{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--gold2);text-align:right;}
+.emd-tc{background:var(--b4);border:1px solid rgba(0,96,255,.15);padding:10px 12px;margin-top:8px;}
+.emd-tc-title{font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--b2);margin-bottom:6px;}
+.emd-tc-row{display:flex;gap:16px;flex-wrap:wrap;font-size:10px;}
+.emd-tc-item{display:flex;flex-direction:column;gap:1px;}
+.emd-tc-lbl{font-size:7px;color:var(--t3);}
+.emd-tc-val{font-weight:700;}
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:700;display:none;align-items:center;justify-content:center;backdrop-filter:blur(20px);}
+.mo.on{display:flex;}
+.mb{background:var(--bg2);border:1px solid var(--w2);width:100%;max-width:680px;max-height:92vh;overflow-y:auto;animation:mIn .2s ease-out;}
+@keyframes mIn{from{opacity:0;transform:scale(.94);}to{opacity:1;transform:scale(1);}}
+.mh{padding:13px 18px;border-bottom:1px solid var(--w);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg2);z-index:1;}
+.mt{font-family:var(--disp);font-size:15px;font-weight:700;letter-spacing:-.5px;}
+.mx{background:none;border:none;color:var(--t3);font-size:16px;cursor:pointer;}
+.mbody{padding:18px;}
+.mft{padding:11px 18px;border-top:1px solid var(--w);display:flex;gap:6px;justify-content:flex-end;position:sticky;bottom:0;background:var(--bg2);}
+.mbtn{padding:7px 16px;font-size:9px;font-weight:700;border:none;cursor:pointer;font-family:var(--body);}
+.mbtn-g{background:var(--g);color:var(--bg);}
+.mbtn-o{background:transparent;border:1px solid var(--w2);color:var(--t2);}
+.mbtn-gold{background:var(--gold);color:var(--bg);}
+.toast-wrap{position:fixed;bottom:14px;right:14px;z-index:9999;display:flex;flex-direction:column;gap:5px;pointer-events:none;}
+.toast{background:var(--bg2);border:1px solid var(--w2);padding:9px 13px;min-width:260px;max-width:360px;display:flex;align-items:flex-start;gap:7px;pointer-events:all;box-shadow:0 12px 40px rgba(0,0,0,.8);animation:tIn .2s ease-out;}
+@keyframes tIn{from{opacity:0;transform:translateX(10px);}to{opacity:1;transform:translateX(0);}}
+.ti{font-size:13px;flex-shrink:0;}
+.tt{font-size:10px;font-weight:700;margin-bottom:1px;}
+.tm{font-size:9px;color:var(--t2);line-height:1.4;}
+.land-hero{padding:80px 28px 60px;max-width:760px;margin:0 auto;text-align:center;}
+.land-hero .ph-title{font-size:clamp(24px,3.5vw,42px);}
+.land-sub{font-size:13px;color:var(--t2);line-height:1.9;max-width:540px;margin:12px auto 32px;}
+.land-btn{display:inline-block;padding:16px 40px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:none;cursor:pointer;font-family:var(--body);background:var(--g);color:var(--bg);text-decoration:none;transition:background .15s;}
+.land-btn:hover{background:var(--g2);}
+.land-checks{display:flex;flex-direction:column;gap:10px;max-width:480px;margin:40px auto 0;text-align:left;}
+.land-check{display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--t2);line-height:1.6;}
+.land-check-icon{color:var(--g);font-size:14px;flex-shrink:0;margin-top:1px;}
+.land-divider{border:none;border-top:1px solid var(--w);margin:40px 28px;}
+.land-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--w);border:1px solid var(--w);max-width:760px;margin:0 auto 60px;}
+.land-stat{background:var(--bg2);padding:20px;text-align:center;}
+.land-stat-v{font-family:var(--disp);font-size:24px;font-weight:700;color:var(--g);margin-bottom:4px;}
+.land-stat-l{font-size:9px;color:var(--t3);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;}
+@media(max-width:900px){.fi-3{grid-template-columns:1fr 1fr;}.srow{grid-template-columns:1fr 1fr !important;}.land-stats{grid-template-columns:1fr;}}
+@media(max-width:600px){.fi-2,.fi-3{grid-template-columns:1fr;}.page{padding:12px;}.land-hero{padding:60px 18px 40px;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nl">
+    <div><div class="nlb">Prop<span>X</span></div><div class="nl-s">Acquisitions</div></div>
+  </div>
+  <div class="ntabs">
+    <button class="nt on" onclick="show('ws')">📥 Submit a Deal</button>
+    <button class="nt" onclick="show('buyer')">🏠 Join Buyer List</button>
+  </div>
+  <div class="nav-r"><div class="lp"><span class="ldot"></span><span class="lt">Live</span></div></div>
+</nav>
+
+<!-- ══════════════════════════════════════════
+  SELLER / WHOLESALER — CLEAN LANDING PAGE
+  Clicks directly to Tally form — no duplicate form
+══════════════════════════════════════════ -->
+<div class="view on" id="view-ws">
+  <div class="land-hero">
+    <div class="ph-lbl">PropX Acquisitions</div>
+    <h1 class="ph-title">Submit Your <em>Property</em></h1>
+    <p class="land-sub">We are a direct acquisitions company. We purchase investment properties in all 50 states — SFR, multifamily, commercial, land, and industrial. Cash close. As-is. No agents. You receive your full asking price at closing.</p>
+    <a href="https://tally.so/r/44LJZd" target="_blank" class="land-btn">Submit Your Property →</a>
+    <div class="land-checks">
+      <div class="land-check"><span class="land-check-icon">✓</span><span><strong style="color:var(--text)">You receive your full asking price</strong> — we do not negotiate below your number</span></div>
+      <div class="land-check"><span class="land-check-icon">✓</span><span><strong style="color:var(--text)">EMD wired within 24 hours</strong> of signed purchase agreement directly to your title company</span></div>
+      <div class="land-check"><span class="land-check-icon">✓</span><span><strong style="color:var(--text)">We handle all closing coordination</strong> — you just show up and sign</span></div>
+      <div class="land-check"><span class="land-check-icon">✓</span><span><strong style="color:var(--text)">Fast close</strong> — typically 10-21 days depending on property type</span></div>
+      <div class="land-check"><span class="land-check-icon">✓</span><span><strong style="color:var(--text)">All 50 states</strong> — SFR, multifamily, commercial, land, and industrial</span></div>
+      <div class="land-check"><span class="land-check-icon">✓</span><span><strong style="color:var(--text)">No surprises</strong> — your net proceeds are locked at acceptance</span></div>
+    </div>
+  </div>
+  <hr class="land-divider">
+  <div class="land-stats">
+    <div class="land-stat"><div class="land-stat-v">50</div><div class="land-stat-l">States Covered</div></div>
+    <div class="land-stat"><div class="land-stat-v">&lt;4hr</div><div class="land-stat-l">Response Time</div></div>
+    <div class="land-stat"><div class="land-stat-v">24hr</div><div class="land-stat-l">EMD Wired</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+  BUYER APPLICATION — CLEAN LANDING PAGE
+  Clicks directly to Tally form — no duplicate form
+══════════════════════════════════════════ -->
+<div class="view" id="view-buyer">
+  <div class="land-hero">
+    <div class="ph-lbl">PropX Buyer Network</div>
+    <h1 class="ph-title">Join Our <em>Buyer List</em></h1>
+    <p class="land-sub">PropX sources off-market investment properties nationwide — SFR, multifamily, commercial, land, and industrial. We sell directly to verified cash buyers. No agents. No MLS. No competition from retail buyers.</p>
+    <a href="https://tally.so/r/XxEJoO" target="_blank" class="land-btn">Apply for Deal Access →</a>
+    <div class="land-checks">
+      <div class="land-check"><span class="land-check-icon">✓</span><span><strong style="color:var(--text)">Deals matched to your exact buy box</strong> — property type, price range, location, and rehab budget</span></div>
+      <div class="land-check"><span class="land-check-icon">✓</span><span><strong style="color:var(--text)">Verified buyers get priority access</strong> — deals sent before the general list sees them</span></div>
+      <div class="land-check"><span class="land-check-icon">✓</span><span><strong style="color:var(--text)">Instant SMS and email alerts</strong> — the moment a matched deal hits our system</span></div>
+      <div class="land-check"><span class="land-check-icon">✓</span><span><strong style="color:var(--text)">Submit offers directly</strong> — EMD wired to title company on acceptance</span></div>
+      <div class="land-check"><span class="land-check-icon">✓</span><span><strong style="color:var(--text)">Free to join</strong> — no subscription, no fees, no membership required</span></div>
+      <div class="land-check"><span class="land-check-icon">✓</span><span><strong style="color:var(--text)">Nationwide inventory</strong> — SFR, multifamily, commercial, land across all 50 states</span></div>
+    </div>
+  </div>
+  <hr class="land-divider">
+  <div class="land-stats">
+    <div class="land-stat"><div class="land-stat-v">247</div><div class="land-stat-l">Verified Buyers</div></div>
+    <div class="land-stat"><div class="land-stat-v">Free</div><div class="land-stat-l">To Join</div></div>
+    <div class="land-stat"><div class="land-stat-v">Instant</div><div class="land-stat-l">Deal Alerts</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+  DEAL COMMAND CENTER — INTERNAL ONLY
+══════════════════════════════════════════ -->
+
+<div class="mo" id="modal" onclick="if(event.target.id==='modal')closeMo()">
+  <div class="mb"><div class="mh"><div class="mt" id="m-title"></div><button class="mx" onclick="closeMo()">✕</button></div><div class="mbody" id="m-body"></div><div class="mft" id="m-ft"></div></div>
+</div>
+<div class="toast-wrap" id="toasts"></div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>const fmt=n=>{if(!n&&n!==0)return'—';const a=Math.abs(Math.round(n));const s=n<0?'-':'';if(a>=1e6)return s+'$'+(a/1e6).toFixed(2)+'M';if(a>=1000)return s+'$'+a.toLocaleString();return s+'$'+a;};
+
+let selectedDeal=null;let selectedTF=null;
+
+function show(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  document.querySelectorAll('.nt').forEach(n=>n.classList.remove('on'));
+  document.getElementById('view-'+id).classList.add('on');
+  const map={ws:0,buyer:1};
+  if(map[id]!==undefined)document.querySelectorAll('.nt')[map[id]]?.classList.add('on');
+  window.scrollTo(0,0);
+}
+
+function toast(icon,title,msg){
+  const w=document.getElementById('toasts');const t=document.createElement('div');t.className='toast';
+  t.innerHTML='<div class="ti">'+icon+'</div><div><div class="tt">'+title+'</div><div class="tm">'+msg+'</div></div>';
+  w.appendChild(t);setTimeout(()=>{t.style.cssText='opacity:0;transform:translateX(10px);transition:all .25s';setTimeout(()=>t.remove(),250);},4500);
+}
+</script>
+</body>
+</html>
