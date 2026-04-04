@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PropX — Deal Flow System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Unbounded:wght@400;700;900&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#03050a;--bg2:#060c14;--bg3:#091018;--bg4:#0d1622;
+  --w:rgba(255,255,255,0.05);--w2:rgba(255,255,255,0.09);--w3:rgba(255,255,255,0.16);
+  --g:#00cc7a;--g2:#00ff99;--g3:rgba(0,204,122,0.1);--g4:rgba(0,204,122,0.05);
+  --r:#ff2d55;--r2:#ff6b80;--r3:rgba(255,45,85,0.1);
+  --b:#0060ff;--b2:#4d90ff;--b3:rgba(0,96,255,0.1);--b4:rgba(0,96,255,0.05);
+  --gold:#f0a500;--gold2:#ffc444;--gold3:rgba(240,165,0,0.1);--gold4:rgba(240,165,0,0.05);
+  --pu:#7c3aed;--pu2:#a78bfa;--pu3:rgba(124,58,237,0.1);
+  --cy:#0891b2;--cy2:#22d3ee;--cy3:rgba(8,145,178,0.1);
+  --text:#dce8f5;--t2:rgba(220,232,245,0.5);--t3:rgba(220,232,245,0.24);--t4:rgba(220,232,245,0.07);
+  --mono:'Space Mono',monospace;--disp:'Unbounded',sans-serif;--body:'Manrope',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--body);overflow-x:hidden;}
+::-webkit-scrollbar{width:2px;}::-webkit-scrollbar-thumb{background:var(--g);}
+nav{position:fixed;top:0;width:100%;z-index:500;height:52px;display:flex;align-items:center;background:rgba(3,5,10,.98);border-bottom:1px solid var(--w2);backdrop-filter:blur(24px);}
+.nl{padding:0 18px;border-right:1px solid var(--w);height:100%;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.nlb{font-family:var(--disp);font-size:17px;font-weight:900;letter-spacing:-1px;}
+.nlb span{color:var(--g);}
+.nl-s{font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t3);}
+.ntabs{display:flex;height:100%;overflow-x:auto;flex:1;}
+.nt{padding:0 14px;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);cursor:pointer;border:none;background:transparent;font-family:var(--body);border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:5px;height:100%;}
+.nt:hover{color:var(--t2);}
+.nt.on{color:var(--g);border-bottom-color:var(--g);}
+.nbadge{background:var(--r);color:#fff;font-size:7px;padding:1px 5px;font-weight:800;}
+.nalert{background:var(--gold);color:var(--bg);font-size:7px;padding:1px 5px;font-weight:800;}
+.nav-r{margin-left:auto;padding:0 14px;display:flex;align-items:center;gap:7px;flex-shrink:0;}
+.lp{display:flex;align-items:center;gap:4px;padding:3px 9px;background:var(--g3);border:1px solid rgba(0,204,122,.18);}
+.ldot{width:4px;height:4px;border-radius:50%;background:var(--g);animation:pulse 1.8s infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,204,122,.4);}60%{opacity:.5;box-shadow:0 0 0 4px transparent;}}
+.lt{font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--g);}
+.view{display:none;padding-top:52px;min-height:100vh;}
+.view.on{display:block;}
+.page{padding:22px;max-width:1400px;margin:0 auto;}
+.ph{margin-bottom:18px;}
+.ph-lbl{font-size:8px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--g);margin-bottom:4px;}
+.ph-title{font-family:var(--disp);font-size:clamp(18px,2.5vw,30px);font-weight:900;letter-spacing:-1px;line-height:1.05;}
+.ph-title em{font-style:normal;color:var(--g);}
+.ph-sub{font-size:12px;color:var(--t2);margin-top:4px;line-height:1.7;max-width:600px;}
+.btn{padding:7px 16px;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;border:none;cursor:pointer;font-family:var(--body);transition:all .15s;}
+.btn-g{background:var(--g);color:var(--bg);}
+.btn-g:hover{background:var(--g2);}
+.btn-b{background:var(--b);color:#fff;}
+.btn-gold{background:var(--gold);color:var(--bg);}
+.btn-pu{background:var(--pu);color:#fff;}
+.btn-r{background:var(--r);color:#fff;}
+.btn-o{background:transparent;border:1px solid var(--w2);color:var(--t2);}
+.btn-o:hover{border-color:var(--g);color:var(--g);}
+.btn-sm{padding:4px 10px;font-size:8px;}
+.btn-xs{padding:3px 8px;font-size:7px;}
+.tag{display:inline-flex;align-items:center;gap:2px;padding:2px 7px;font-size:7px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+.tg{background:var(--g3);color:var(--g);border:1px solid rgba(0,204,122,.2);}
+.tr{background:var(--r3);color:var(--r2);border:1px solid rgba(255,45,85,.2);}
+.tb{background:var(--b3);color:var(--b2);border:1px solid rgba(0,96,255,.2);}
+.tgo{background:var(--gold3);color:var(--gold2);border:1px solid rgba(240,165,0,.2);}
+.tp{background:var(--pu3);color:var(--pu2);border:1px solid rgba(124,58,237,.2);}
+.tc{background:var(--cy3);color:var(--cy2);border:1px solid rgba(8,145,178,.2);}
+.tgr{background:var(--t4);color:var(--t3);border:1px solid var(--w);}
+.mono{font-family:var(--mono);}
+.panel{background:var(--bg2);border:1px solid var(--w);}
+.phd{padding:11px 14px;border-bottom:1px solid var(--w);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.phd-t{font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);}
+.pbody{padding:14px;}
+.srow{display:grid;gap:1px;background:var(--w);border:1px solid var(--w);margin-bottom:16px;}
+.sc{background:var(--bg2);padding:12px 14px;}
+.sc-l{font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t3);margin-bottom:3px;}
+.sc-v{font-family:var(--disp);font-size:19px;font-weight:700;line-height:1;}
+.sc-s{font-size:8px;margin-top:2px;}
+.up{color:var(--g);}
+.dn{color:var(--r);}
+.fi{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+.fi label{font-size:7px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);}
+.fi input,.fi select,.fi textarea{background:var(--bg3);border:1px solid var(--w2);color:var(--text);padding:9px 11px;font-family:var(--body);font-size:12px;outline:none;transition:border-color .15s;width:100%;}
+.fi input:focus,.fi select:focus,.fi textarea:focus{border-color:rgba(0,204,122,.4);}
+.fi input::placeholder,.fi textarea::placeholder{color:var(--t3);}
+.fi select option{background:var(--bg2);}
+.fi textarea{resize:vertical;min-height:70px;}
+.fi-hint{font-size:8px;color:var(--t3);margin-top:2px;line-height:1.4;}
+.fi-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.fi-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.sec-lbl{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--g);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--w);}
+.pipeline{display:grid;gap:1px;background:var(--w);}
+.pipe-step{background:var(--bg2);padding:10px 14px;display:flex;align-items:center;gap:10px;position:relative;overflow:hidden;}
+.pipe-step.done{background:rgba(0,204,122,.03);}
+.pipe-step.active{background:rgba(0,204,122,.06);}
+.pipe-accent{position:absolute;left:0;top:0;bottom:0;width:3px;}
+.pipe-info{flex:1;}
+.pipe-name{font-size:11px;font-weight:700;margin-bottom:1px;}
+.pipe-sub{font-size:9px;color:var(--t3);line-height:1.4;}
+.dcard{background:var(--bg2);border:1px solid var(--w);margin-bottom:10px;overflow:hidden;}
+.dc-top{padding:12px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;border-bottom:1px solid var(--w);}
+.dc-addr{font-size:13px;font-weight:700;margin-bottom:2px;}
+.dc-meta{font-size:9px;color:var(--t3);}
+.dc-pr{text-align:right;flex-shrink:0;}
+.dc-price{font-family:var(--disp);font-size:19px;font-weight:700;color:var(--g);line-height:1;}
+.dc-price-lbl{font-size:7px;color:var(--t3);margin-bottom:2px;}
+.dc-nums{display:grid;border-bottom:1px solid var(--w);}
+.dn-cell{padding:9px 12px;border-right:1px solid var(--w);}
+.dn-cell:last-child{border-right:none;}
+.dn-l{font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:2px;}
+.dn-v{font-family:var(--mono);font-size:12px;font-weight:700;}
+.dc-bot{padding:9px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--bg3);}
+.ec{background:var(--bg);border:1px solid var(--w2);}
+.ec-hd{padding:8px 12px;background:var(--bg3);border-bottom:1px solid var(--w);display:flex;gap:5px;}
+.ec-dot{width:8px;height:8px;border-radius:50%;}
+.ec-f{padding:6px 12px;border-bottom:1px solid var(--w);font-size:9px;display:flex;gap:8px;}
+.ec-fl{font-size:7px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);width:52px;flex-shrink:0;margin-top:1px;}
+.ec-fv{font-family:var(--mono);font-size:10px;color:var(--t2);}
+.ec-fv.hi{color:var(--gold2);}
+.ec-body{padding:14px;font-size:11px;line-height:2;color:var(--t2);}
+.ec-body strong{color:var(--text);}
+.ec-body .g{color:var(--g);}
+.ec-body .gold{color:var(--gold2);}
+.ec-ft{padding:9px 12px;border-top:1px solid var(--w);background:var(--bg3);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;}
+.doc-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--w);font-size:11px;}
+.doc-item:last-child{border-bottom:none;}
+.doc-icon{font-size:14px;flex-shrink:0;}
+.showing-card{background:var(--bg2);border:1px solid var(--w);padding:14px 16px;margin-bottom:8px;}
+.sc-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
+.sc-buyer{font-size:12px;font-weight:700;margin-bottom:2px;}
+.sc-deal{font-size:9px;color:var(--t3);}
+.sc-time{font-family:var(--mono);font-size:11px;color:var(--gold2);text-align:right;}
+.sc-auto-note{background:var(--g4);border:1px solid rgba(0,204,122,.1);padding:8px 10px;font-size:9px;color:var(--t2);line-height:1.5;}
+.emd-card{background:var(--bg2);border:1px solid var(--w);padding:14px 16px;margin-bottom:8px;}
+.emd-top{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+.emd-deal{font-size:12px;font-weight:700;margin-bottom:2px;}
+.emd-meta{font-size:9px;color:var(--t3);}
+.emd-amount{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--gold2);text-align:right;}
+.emd-tc{background:var(--b4);border:1px solid rgba(0,96,255,.15);padding:10px 12px;margin-top:8px;}
+.emd-tc-title{font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--b2);margin-bottom:6px;}
+.emd-tc-row{display:flex;gap:16px;flex-wrap:wrap;font-size:10px;}
+.emd-tc-item{display:flex;flex-direction:column;gap:1px;}
+.emd-tc-lbl{font-size:7px;color:var(--t3);}
+.emd-tc-val{font-weight:700;}
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:700;display:none;align-items:center;justify-content:center;backdrop-filter:blur(20px);}
+.mo.on{display:flex;}
+.mb{background:var(--bg2);border:1px solid var(--w2);width:100%;max-width:680px;max-height:92vh;overflow-y:auto;animation:mIn .2s ease-out;}
+@keyframes mIn{from{opacity:0;transform:scale(.94);}to{opacity:1;transform:scale(1);}}
+.mh{padding:13px 18px;border-bottom:1px solid var(--w);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg2);z-index:1;}
+.mt{font-family:var(--disp);font-size:15px;font-weight:700;letter-spacing:-.5px;}
+.mx{background:none;border:none;color:var(--t3);font-size:16px;cursor:pointer;}
+.mbody{padding:18px;}
+.mft{padding:11px 18px;border-top:1px solid var(--w);display:flex;gap:6px;justify-content:flex-end;position:sticky;bottom:0;background:var(--bg2);}
+.mbtn{padding:7px 16px;font-size:9px;font-weight:700;border:none;cursor:pointer;font-family:var(--body);}
+.mbtn-g{background:var(--g);color:var(--bg);}
+.mbtn-o{background:transparent;border:1px solid var(--w2);color:var(--t2);}
+.mbtn-gold{background:var(--gold);color:var(--bg);}
+.toast-wrap{position:fixed;bottom:14px;right:14px;z-index:9999;display:flex;flex-direction:column;gap:5px;pointer-events:none;}
+.toast{background:var(--bg2);border:1px solid var(--w2);padding:9px 13px;min-width:260px;max-width:360px;display:flex;align-items:flex-start;gap:7px;pointer-events:all;box-shadow:0 12px 40px rgba(0,0,0,.8);animation:tIn .2s ease-out;}
+@keyframes tIn{from{opacity:0;transform:translateX(10px);}to{opacity:1;transform:translateX(0);}}
+.ti{font-size:13px;flex-shrink:0;}
+.tt{font-size:10px;font-weight:700;margin-bottom:1px;}
+.tm{font-size:9px;color:var(--t2);line-height:1.4;}
+.land-hero{padding:80px 28px 60px;max-width:760px;margin:0 auto;text-align:center;}
+.land-hero .ph-title{font-size:clamp(24px,3.5vw,42px);}
+.land-sub{font-size:13px;color:var(--t2);line-height:1.9;max-width:540px;margin:12px auto 32px;}
+.land-btn{display:inline-block;padding:16px 40px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:none;cursor:pointer;font-family:var(--body);background:var(--g);color:var(--bg);text-decoration:none;transition:background .15s;}
+.land-btn:hover{background:var(--g2);}
+.land-checks{display:flex;flex-direction:column;gap:10px;max-width:480px;margin:40px auto 0;text-align:left;}
+.land-check{display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--t2);line-height:1.6;}
+.land-check-icon{color:var(--g);font-size:14px;flex-shrink:0;margin-top:1px;}
+.land-divider{border:none;border-top:1px solid var(--w);margin:40px 28px;}
+.land-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--w);border:1px solid var(--w);max-width:760px;margin:0 auto 60px;}
+.land-stat{background:var(--bg2);padding:20px;text-align:center;}
+.land-stat-v{font-family:var(--disp);font-size:24px;font-weight:700;color:var(--g);margin-bottom:4px;}
+.land-stat-l{font-size:9px;color:var(--t3);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;}
+@media(max-width:900px){.fi-3{grid-template-columns:1fr 1fr;}.srow{grid-template-columns:1fr 1fr !important;}.land-stats{grid-template-columns:1fr;}}
+@media(max-width:600px){.fi-2,.fi-3{grid-template-columns:1fr;}.page{padding:12px;}.land-hero{padding:60px 18px 40px;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nl">
+    <div><div class="nlb">Prop<span>X</span></div><div class="nl-s">Acquisitions</div></div>
+  </div>
+  <div class="ntabs">
+    <button class="nt on" onclick="show('ws')">📥 Submit a Deal</button>
+    <button class="nt" onclick="show('buyer')">🏠 Join Buyer List</button>
+    <button class="nt" onclick="show('command')">⚡ Command Center <span class="nbadge" id="deal-ct">4</span></button>
+    <button class="nt" onclick="show('firewall')">🔒 Info Firewall</button>
+    <button class="nt" onclick="show('docs')">📋 Documents <span class="nalert">2</span></button>
+    <button class="nt" onclick="show('showings')">👁 Showings</button>
+    <button class="nt" onclick="show('emd')">💰 EMD Tracker</button>
+    <button class="nt" onclick="show('tfund')">📧 T-Funder Docs <span class="nbadge">1</span></button>
+    <button class="nt" onclick="show('settings')">⚙ Settings</button>
+  </div>
+  <div class="nav-r"><div class="lp"><span class="ldot"></span><span class="lt">Live</span></div></div>
+</nav>
+
+<!-- ══════════════════════════════════════════
+  SELLER / WHOLESALER — CLEAN LANDING PAGE
+  Clicks directly to Tally form — no duplicate form
+══════════════════════════════════════════ -->
+<div class="view on" id="view-ws">
+  <div class="land-hero">
+    <div class="ph-lbl">PropX Acquisitions</div>
+    <h1 class="ph-title">Submit Your <em>Property</em></h1>
+    <p class="land-sub">We are a direct acquisitions company. We purchase investment properties in all 50 states — SFR, multifamily, commercial, land, and industrial. Cash close. As-is. No agents. You receive your full asking price at closing.</p>
+    <a href="https://tally.so/r/44LJZd" target="_blank" class="land-btn">Submit Your Property →</a>
+    <div class="land-checks">
+      <div class="land-check"><span class="land-check-icon">✓</span><span><strong style="color:var(--text)">You receive your full asking price</strong> — we do not negotiate below your number</span></div>
+      <div class="land-check"><span class="land-check-icon">✓</span><span><strong style="color:var(--text)">EMD wired within 24 hours</strong> of signed purchase agreement directly to your title company</span></div>
+      <div class="land-check"><span class="land-check-icon">✓</span><span><strong style="color:var(--text)">We handle all closing coordination</strong> — you just show up and sign</span></div>
+      <div class="land-check"><span class="land-check-icon">✓</span><span><strong style="color:var(--text)">Fast close</strong> — typically 10-21 days depending on property type</span></div>
+      <div class="land-check"><span class="land-check-icon">✓</span><span><strong style="color:var(--text)">All 50 states</strong> — SFR, multifamily, commercial, land, and industrial</span></div>
+      <div class="land-check"><span class="land-check-icon">✓</span><span><strong style="color:var(--text)">No surprises</strong> — your net proceeds are locked at acceptance</span></div>
+    </div>
+  </div>
+  <hr class="land-divider">
+  <div class="land-stats">
+    <div class="land-stat"><div class="land-stat-v">50</div><div class="land-stat-l">States Covered</div></div>
+    <div class="land-stat"><div class="land-stat-v">&lt;4hr</div><div class="land-stat-l">Response Time</div></div>
+    <div class="land-stat"><div class="land-stat-v">24hr</div><div class="land-stat-l">EMD Wired</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+  BUYER APPLICATION — CLEAN LANDING PAGE
+  Clicks directly to Tally form — no duplicate form
+══════════════════════════════════════════ -->
+<div class="view" id="view-buyer">
+  <div class="land-hero">
+    <div class="ph-lbl">PropX Buyer Network</div>
+    <h1 class="ph-title">Join Our <em>Buyer List</em></h1>
+    <p class="land-sub">PropX sources off-market investment properties nationwide — SFR, multifamily, commercial, land, and industrial. We sell directly to verified cash buyers. No agents. No MLS. No competition from retail buyers.</p>
+    <a href="https://tally.so/r/XxEJoO" target="_blank" class="land-btn">Apply for Deal Access →</a>
+    <div class="land-checks">
+      <div class="land-check"><span class="land-check-icon">✓</span><span><strong style="color:var(--text)">Deals matched to your exact buy box</strong> — property type, price range, location, and rehab budget</span></div>
+      <div class="land-check"><span class="land-check-icon">✓</span><span><strong style="color:var(--text)">Verified buyers get priority access</strong> — deals sent before the general list sees them</span></div>
+      <div class="land-check"><span class="land-check-icon">✓</span><span><strong style="color:var(--text)">Instant SMS and email alerts</strong> — the moment a matched deal hits our system</span></div>
+      <div class="land-check"><span class="land-check-icon">✓</span><span><strong style="color:var(--text)">Submit offers directly</strong> — EMD wired to title company on acceptance</span></div>
+      <div class="land-check"><span class="land-check-icon">✓</span><span><strong style="color:var(--text)">Free to join</strong> — no subscription, no fees, no membership required</span></div>
+      <div class="land-check"><span class="land-check-icon">✓</span><span><strong style="color:var(--text)">Nationwide inventory</strong> — SFR, multifamily, commercial, land across all 50 states</span></div>
+    </div>
+  </div>
+  <hr class="land-divider">
+  <div class="land-stats">
+    <div class="land-stat"><div class="land-stat-v">247</div><div class="land-stat-l">Verified Buyers</div></div>
+    <div class="land-stat"><div class="land-stat-v">Free</div><div class="land-stat-l">To Join</div></div>
+    <div class="land-stat"><div class="land-stat-v">Instant</div><div class="land-stat-l">Deal Alerts</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+  DEAL COMMAND CENTER — INTERNAL ONLY
+══════════════════════════════════════════ -->
+<div class="view" id="view-command">
+<div class="page">
+  <div class="ph">
+    <div class="ph-lbl">Internal — Eyes Only</div>
+    <h1 class="ph-title">Deal <em>Command Center</em></h1>
+    <p class="ph-sub">Full picture. Every deal from both sides. Your spread, T-funder cost, and net profit on every transaction. Neither party ever sees this view.</p>
+  </div>
+  <div class="srow" style="grid-template-columns:repeat(6,1fr)">
+    <div class="sc"><div class="sc-l">New Deals In</div><div class="sc-v up">4</div><div class="sc-s up">↑ 2 today</div></div>
+    <div class="sc"><div class="sc-l">Blasted to Buyers</div><div class="sc-v" style="color:var(--gold2)">8</div></div>
+    <div class="sc"><div class="sc-l">Offers Received</div><div class="sc-v" style="color:var(--b2)">12</div></div>
+    <div class="sc"><div class="sc-l">Both Sides Signed</div><div class="sc-v">3</div></div>
+    <div class="sc"><div class="sc-l">EMD in Escrow</div><div class="sc-v" style="color:var(--gold2)">$28,400</div></div>
+    <div class="sc"><div class="sc-l">MTD Net Profit</div><div class="sc-v up">$87,200</div></div>
+  </div>
+  <div id="command-deals"></div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════
+  INFORMATION FIREWALL
+══════════════════════════════════════════ -->
+<div class="view" id="view-firewall">
+<div class="page">
+  <div class="ph">
+    <div class="ph-lbl">Privacy Architecture</div>
+    <h1 class="ph-title">Information <em>Firewall</em></h1>
+    <p class="ph-sub">Exactly what each party sees — and what they never see. Every document, email, and communication is filtered through this firewall automatically.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:0;border:1px solid var(--w);background:var(--bg2);margin-bottom:20px;overflow:hidden">
+    <div style="padding:20px;background:var(--b4);border-right:2px solid var(--r)">
+      <div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--b2);margin-bottom:12px">🏠 Seller / Wholesaler Sees</div>
+      <div style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:10px;color:var(--t2);display:flex;gap:6px"><span style="color:var(--g)">✓</span>Their asking price</div>
+      <div style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:10px;color:var(--t2);display:flex;gap:6px"><span style="color:var(--g)">✓</span>Their title company</div>
+      <div style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:10px;color:var(--t2);display:flex;gap:6px"><span style="color:var(--g)">✓</span>Their EMD amount</div>
+      <div style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:10px;color:var(--t2);display:flex;gap:6px"><span style="color:var(--g)">✓</span>Closing date</div>
+      <div style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:10px;color:var(--t2);display:flex;gap:6px"><span style="color:var(--g)">✓</span>PropX as buyer</div>
+      <div style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:10px;color:var(--t2);display:flex;gap:6px"><span style="color:var(--g)">✓</span>Property access coordination</div>
+      <div style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:10px;color:var(--t2);display:flex;gap:6px"><span style="color:var(--g)">✓</span>Their net proceeds at close</div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,45,85,.2)">
+        <div style="font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--r2);margin-bottom:6px">Never Sees</div>
+        <div style="padding:4px 0;font-size:10px;color:var(--r2);display:flex;gap:6px"><span>✕</span>Your list price to buyer</div>
+        <div style="padding:4px 0;font-size:10px;color:var(--r2);display:flex;gap:6px"><span>✕</span>Your spread / profit</div>
+        <div style="padding:4px 0;font-size:10px;color:var(--r2);display:flex;gap:6px"><span>✕</span>Buyer identity</div>
+        <div style="padding:4px 0;font-size:10px;color:var(--r2);display:flex;gap:6px"><span>✕</span>That a buyer exists</div>
+        <div style="padding:4px 0;font-size:10px;color:var(--r2);display:flex;gap:6px"><span>✕</span>T-funder involvement</div>
+        <div style="padding:4px 0;font-size:10px;color:var(--r2);display:flex;gap:6px"><span>✕</span>That you're double closing</div>
+        <div style="padding:4px 0;font-size:10px;color:var(--r2);display:flex;gap:6px"><span>✕</span>B-side contract</div>
+      </div>
+    </div>
+    <div style="width:2px;background:var(--r);position:relative;display:flex;align-items:center;justify-content:center">
+      <div style="position:absolute;background:var(--bg2);padding:6px 3px;font-size:16px;z-index:1">🔒</div>
+    </div>
+    <div style="padding:20px;background:var(--gold4)">
+      <div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold2);margin-bottom:12px">⚡ You See — Everything</div>
+      <div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;color:var(--gold2);display:flex;gap:6px"><span>★</span>Seller ask price (A-side)</div>
+      <div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;color:var(--gold2);display:flex;gap:6px"><span>★</span>Your list price to buyer (B-side)</div>
+      <div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;color:var(--gold2);display:flex;gap:6px"><span>★</span>Your gross spread</div>
+      <div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;color:var(--gold2);display:flex;gap:6px"><span>★</span>T-funder cost</div>
+      <div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;color:var(--gold2);display:flex;gap:6px"><span>★</span>Your net profit</div>
+      <div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;color:var(--gold2);display:flex;gap:6px"><span>★</span>Both signed contracts</div>
+      <div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;color:var(--gold2);display:flex;gap:6px"><span>★</span>Title company on both sides</div>
+      <div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;color:var(--gold2);display:flex;gap:6px"><span>★</span>Buyer identity</div>
+      <div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;color:var(--gold2);display:flex;gap:6px"><span>★</span>Seller identity</div>
+      <div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;color:var(--gold2);display:flex;gap:6px"><span>★</span>All communication</div>
+      <div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;color:var(--gold2);display:flex;gap:6px"><span>★</span>Full deal timeline</div>
+      <div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;color:var(--gold2);display:flex;gap:6px"><span>★</span>EMD status</div>
+    </div>
+    <div style="width:2px;background:var(--r);position:relative;display:flex;align-items:center;justify-content:center">
+      <div style="position:absolute;background:var(--bg2);padding:6px 3px;font-size:16px;z-index:1">🔒</div>
+    </div>
+    <div style="padding:20px;background:var(--g4);border-left:2px solid var(--r)">
+      <div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--g);margin-bottom:12px">💰 Buyer Sees</div>
+      <div style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:10px;color:var(--t2);display:flex;gap:6px"><span style="color:var(--g)">✓</span>PropX list price (your price)</div>
+      <div style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:10px;color:var(--t2);display:flex;gap:6px"><span style="color:var(--g)">✓</span>Property details (rewritten)</div>
+      <div style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:10px;color:var(--t2);display:flex;gap:6px"><span style="color:var(--g)">✓</span>ARV and rehab estimate</div>
+      <div style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:10px;color:var(--t2);display:flex;gap:6px"><span style="color:var(--g)">✓</span>Inspection period</div>
+      <div style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:10px;color:var(--t2);display:flex;gap:6px"><span style="color:var(--g)">✓</span>Title company for EMD wire</div>
+      <div style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:10px;color:var(--t2);display:flex;gap:6px"><span style="color:var(--g)">✓</span>PropX as seller</div>
+      <div style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:10px;color:var(--t2);display:flex;gap:6px"><span style="color:var(--g)">✓</span>Their offer status</div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,45,85,.2)">
+        <div style="font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--r2);margin-bottom:6px">Never Sees</div>
+        <div style="padding:4px 0;font-size:10px;color:var(--r2);display:flex;gap:6px"><span>✕</span>Seller identity or contact</div>
+        <div style="padding:4px 0;font-size:10px;color:var(--r2);display:flex;gap:6px"><span>✕</span>Seller asking price</div>
+        <div style="padding:4px 0;font-size:10px;color:var(--r2);display:flex;gap:6px"><span>✕</span>Your spread / profit</div>
+        <div style="padding:4px 0;font-size:10px;color:var(--r2);display:flex;gap:6px"><span>✕</span>A-side contract</div>
+        <div style="padding:4px 0;font-size:10px;color:var(--r2);display:flex;gap:6px"><span>✕</span>T-funder involvement</div>
+        <div style="padding:4px 0;font-size:10px;color:var(--r2);display:flex;gap:6px"><span>✕</span>That a double close is happening</div>
+        <div style="padding:4px 0;font-size:10px;color:var(--r2);display:flex;gap:6px"><span>✕</span>Where you got the deal</div>
+      </div>
+    </div>
+  </div>
+  <div style="background:var(--bg2);border:1px solid var(--w);padding:20px;margin-bottom:16px">
+    <div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t3);margin-bottom:14px">Language Firewall — Words Scrubbed from All External Communications</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div style="font-size:9px;font-weight:700;color:var(--r2);margin-bottom:8px">❌ Never Used Externally</div>
+        <div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--w);font-size:10px"><span style="color:var(--r2);flex:1">Double close</span><span style="color:var(--r2);flex:1">Simultaneous closing</span></div>
+        <div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--w);font-size:10px"><span style="color:var(--r2);flex:1">Transactional funding</span><span style="color:var(--r2);flex:1">T-funder</span></div>
+        <div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--w);font-size:10px"><span style="color:var(--r2);flex:1">Wholesale</span><span style="color:var(--r2);flex:1">Wholesaler</span></div>
+        <div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--w);font-size:10px"><span style="color:var(--r2);flex:1">My buyer</span><span style="color:var(--r2);flex:1">My seller</span></div>
+        <div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--w);font-size:10px"><span style="color:var(--r2);flex:1">Spread</span><span style="color:var(--r2);flex:1">My profit</span></div>
+        <div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--w);font-size:10px"><span style="color:var(--r2);flex:1">Assignment</span><span style="color:var(--r2);flex:1">Assignment fee</span></div>
+        <div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--w);font-size:10px"><span style="color:var(--r2);flex:1">End buyer</span><span style="color:var(--r2);flex:1">Original seller</span></div>
+        <div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--w);font-size:10px"><span style="color:var(--r2);flex:1">B-side</span><span style="color:var(--r2);flex:1">A-side</span></div>
+      </div>
+      <div>
+        <div style="font-size:9px;font-weight:700;color:var(--g);margin-bottom:8px">✓ Used Instead</div>
+        <div style="padding:5px 0;border-bottom:1px solid var(--w);font-size:9px"><div style="color:var(--g);margin-bottom:1px">To seller: "We purchase directly"</div><div style="color:var(--g)">To buyer: "We source off-market"</div></div>
+        <div style="padding:5px 0;border-bottom:1px solid var(--w);font-size:9px"><div style="color:var(--g);margin-bottom:1px">To seller: "Our closing team"</div><div style="color:var(--g)">To buyer: "PropX price"</div></div>
+        <div style="padding:5px 0;border-bottom:1px solid var(--w);font-size:9px"><div style="color:var(--g);margin-bottom:1px">To title co: "Two transactions"</div><div style="color:var(--g)">To both: "Acquisition company"</div></div>
+        <div style="padding:5px 0;border-bottom:1px solid var(--w);font-size:9px"><div style="color:var(--g);margin-bottom:1px">To seller: "Inspection team"</div><div style="color:var(--g)">To buyer: "Due diligence period"</div></div>
+        <div style="padding:5px 0;border-bottom:1px solid var(--w);font-size:9px"><div style="color:var(--g);margin-bottom:1px">To both: "PropX LLC"</div><div style="color:var(--g)">Internal only: your spread</div></div>
+        <div style="padding:5px 0;border-bottom:1px solid var(--w);font-size:9px"><div style="color:var(--g);margin-bottom:1px">To seller: "We close in X days"</div><div style="color:var(--g)">To buyer: "Our acquisition team"</div></div>
+        <div style="padding:5px 0;border-bottom:1px solid var(--w);font-size:9px"><div style="color:var(--g);margin-bottom:1px">To title: "Keep stmts separate"</div><div style="color:var(--g)">To T-funder: Everything openly</div></div>
+      </div>
+    </div>
+  </div>
+  <div style="background:var(--bg2);border:1px solid var(--w);padding:20px">
+    <div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t3);margin-bottom:12px">Title Company Instructions — Sent Automatically with Every Deal</div>
+    <div class="ec" style="border:1px solid var(--w2)">
+      <div class="ec-hd"><div class="ec-dot" style="background:#ef4444"></div><div class="ec-dot" style="background:#f59e0b;margin-left:4px"></div><div class="ec-dot" style="background:#22c55e;margin-left:4px"></div></div>
+      <div class="ec-f"><span class="ec-fl">TO</span><span class="ec-fv">Title Officer — Closing Attorney</span></div>
+      <div class="ec-f"><span class="ec-fl">SUBJECT</span><span class="ec-fv">Closing Instructions — [Property Address] — PropX LLC</span></div>
+      <div class="ec-body">
+        Hi [Name],<br><br>
+        We have two transactions on this property that we need to schedule for simultaneous closing.<br><br>
+        <strong>Transaction 1:</strong> PropX LLC purchases from seller<br>
+        <strong>Transaction 2:</strong> PropX LLC sells to end purchaser<br><br>
+        Please prepare two separate settlement statements — one for each transaction. <strong>The two statements should be kept separate and confidential</strong> from each party respectively.<br><br>
+        Our funding will cover the first purchase. Funds from our purchaser will arrive simultaneously. Standard simultaneous close procedure applies.<br><br>
+        Please confirm you are able to handle both transactions on the same day.<br><br>
+        <strong>PropX LLC — Closing Coordination</strong><br>
+        <span class="g"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="99fdfcf8f5ead9e9ebf6e9e1b7ecea">[email&#160;protected]</a></span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- DOCUMENTS -->
+<div class="view" id="view-docs">
+<div class="page">
+  <div class="ph">
+    <div class="ph-lbl">Document Pipeline</div>
+    <h1 class="ph-title">Deal <em>Documents</em></h1>
+    <p class="ph-sub">Both contracts generated and sent automatically. A-side goes to seller only. B-side goes to buyer only. Neither sees the other's contract.</p>
+  </div>
+  <div id="docs-list"></div>
+</div>
+</div>
+
+<!-- SHOWINGS -->
+<div class="view" id="view-showings">
+<div class="page">
+  <div class="ph">
+    <div class="ph-lbl">Property Access</div>
+    <h1 class="ph-title">Showing <em>Coordination</em></h1>
+    <p class="ph-sub">Buyer requests access. System texts the seller's showing contact automatically — framed as "our inspection team." Neither party knows it's a buyer viewing the property.</p>
+  </div>
+  <div id="showings-list"></div>
+</div>
+</div>
+
+<!-- EMD TRACKER -->
+<div class="view" id="view-emd">
+<div class="page">
+  <div class="ph">
+    <div class="ph-lbl">Earnest Money</div>
+    <h1 class="ph-title">EMD <em>Tracker</em></h1>
+    <p class="ph-sub">Every earnest money deposit tracked from wire instruction sent to escrow confirmed.</p>
+  </div>
+  <div class="srow" style="grid-template-columns:repeat(4,1fr)">
+    <div class="sc"><div class="sc-l">Total in Escrow</div><div class="sc-v" style="color:var(--gold2)">$28,400</div></div>
+    <div class="sc"><div class="sc-l">Pending Wire (24hr)</div><div class="sc-v" style="color:var(--r)">2</div></div>
+    <div class="sc"><div class="sc-l">Confirmed Received</div><div class="sc-v up">4</div></div>
+    <div class="sc"><div class="sc-l">Applied to Closing</div><div class="sc-v">3</div></div>
+  </div>
+  <div id="emd-list"></div>
+</div>
+</div>
+
+<!-- T-FUNDER DOCS -->
+<div class="view" id="view-tfund">
+<div class="page">
+  <div class="ph">
+    <div class="ph-lbl">Transactional Funding</div>
+    <h1 class="ph-title">T-Funder <em>Package</em></h1>
+    <p class="ph-sub">Select a deal. System auto-builds the complete funding request. Your only manual step — review and send.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:280px 1fr;gap:14px">
+    <div>
+      <div class="panel" style="margin-bottom:10px">
+        <div class="phd"><div class="phd-t">Deals Ready to Fund</div></div>
+        <div id="tf-deal-list"></div>
+      </div>
+      <div class="panel" style="margin-bottom:10px">
+        <div class="phd"><div class="phd-t">T-Funders on File</div></div>
+        <div id="tf-contacts"></div>
+      </div>
+      <div class="panel">
+        <div class="phd"><div class="phd-t">Document Checklist</div></div>
+        <div id="tf-checklist"></div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold2);margin-bottom:8px">AUTO-GENERATED — Review before sending</div>
+      <div class="ec" id="tf-email-composer">
+        <div class="ec-hd"><div class="ec-dot" style="background:#ef4444"></div><div class="ec-dot" style="background:#f59e0b;margin-left:4px"></div><div class="ec-dot" style="background:#22c55e;margin-left:4px"></div></div>
+        <div class="ec-f"><span class="ec-fl">FROM</span><span class="ec-fv"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b6d2d3d7dac5f6c6c4d9c6ce98c3c5">[email&#160;protected]</a> (PropX LLC)</span></div>
+        <div class="ec-f"><span class="ec-fl">TO</span><span class="ec-fv hi" id="tf-to">Select deal + T-funder to populate →</span></div>
+        <div class="ec-f"><span class="ec-fl">SUBJECT</span><span class="ec-fv" id="tf-subj">—</span></div>
+        <div class="ec-f"><span class="ec-fl">ATTACH</span><span class="ec-fv" style="color:var(--b2)" id="tf-attach">—</span></div>
+        <div class="ec-body" id="tf-body">Select a deal on the left to auto-populate this funding request.</div>
+        <div class="ec-ft">
+          <div style="font-size:8px;color:var(--t3)" id="tf-status">No deal selected</div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-o btn-sm" onclick="copyTF()">📋 Copy All</button>
+            <button class="btn btn-gold btn-sm" id="tf-send" onclick="sendTF()" style="opacity:.4" disabled>📧 Send Package</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- SETTINGS -->
+<div class="view" id="view-settings">
+<div class="page" style="max-width:860px">
+  <div class="ph">
+    <div class="ph-lbl">System Configuration</div>
+    <h1 class="ph-title">Settings & <em>Controls</em></h1>
+  </div>
+  <div class="panel" style="margin-bottom:14px">
+    <div class="phd"><div class="phd-t">Your Spread Rules</div></div>
+    <div class="pbody">
+      <div class="fi-3" style="margin-bottom:10px">
+        <div class="fi"><label>Minimum Net Profit ($)</label><input value="10000" type="number"/></div>
+        <div class="fi"><label>Default Spread % Added to Ask</label><input value="12" type="number"/><div class="fi-hint">System auto-adds this % to seller ask to get your list price</div></div>
+        <div class="fi"><label>Closing Cost Buffer ($)</label><input value="2400" type="number"/></div>
+      </div>
+      <div class="fi-3">
+        <div class="fi"><label>T-Fund Rate (%)</label><input value="1.5" type="number" step="0.1"/></div>
+        <div class="fi"><label>Auto-Approve Offers Over Floor</label><select><option>Yes — auto-approve</option><option>No — manual review all</option></select></div>
+        <div class="fi"><label>Deal Type Preference</label><select><option>All deals</option><option>Fixed price only</option><option>Auction only</option></select></div>
+      </div>
+      <button class="btn btn-g btn-sm" onclick="toast('✅','Saved','Spread rules updated.')">Save Rules</button>
+    </div>
+  </div>
+  <div class="panel" style="margin-bottom:14px">
+    <div class="phd"><div class="phd-t">T-Funder Contacts</div><button class="btn btn-o btn-sm" onclick="openMo('add-tf')">+ Add T-Funder</button></div>
+    <div id="settings-tfunders"></div>
+  </div>
+  <div class="panel" style="margin-bottom:14px">
+    <div class="phd"><div class="phd-t">Approved Title Companies by Market</div><button class="btn btn-o btn-sm" onclick="openMo('add-tc')">+ Add Title Company</button></div>
+    <div id="settings-titlecos"></div>
+  </div>
+  <div class="panel">
+    <div class="phd"><div class="phd-t">Automation Triggers</div></div>
+    <div class="pbody">
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--w)">
+        <div style="flex:1"><div style="font-size:11px;font-weight:700;margin-bottom:2px">Deal submitted by seller</div><div style="font-size:9px;color:var(--t3);line-height:1.5">Run profit engine → generate list price → queue for blast</div></div>
+        <span class="tag tg">Active</span>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--w)">
+        <div style="flex:1"><div style="font-size:11px;font-weight:700;margin-bottom:2px">Offer received over floor</div><div style="font-size:9px;color:var(--t3);line-height:1.5">Auto-accept → generate B-side DocuSign → send EMD wire instructions</div></div>
+        <span class="tag tg">Active</span>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--w)">
+        <div style="flex:1"><div style="font-size:11px;font-weight:700;margin-bottom:2px">B-side signed by buyer</div><div style="font-size:9px;color:var(--t3);line-height:1.5">Generate T-funder package → flag for your review → send on approval</div></div>
+        <span class="tag tg">Active</span>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--w)">
+        <div style="flex:1"><div style="font-size:11px;font-weight:700;margin-bottom:2px">EMD received in escrow</div><div style="font-size:9px;color:var(--t3);line-height:1.5">Notify seller title company → confirm closing date → update pipeline</div></div>
+        <span class="tag tg">Active</span>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--w)">
+        <div style="flex:1"><div style="font-size:11px;font-weight:700;margin-bottom:2px">Buyer requests showing</div><div style="font-size:9px;color:var(--t3);line-height:1.5">Text seller showing contact → coordinate time → send access info to buyer</div></div>
+        <span class="tag tg">Active</span>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--w)">
+        <div style="flex:1"><div style="font-size:11px;font-weight:700;margin-bottom:2px">Title company not on approved list</div><div style="font-size:9px;color:var(--t3);line-height:1.5">Substitute preferred title company → notify seller (neutral language)</div></div>
+        <span class="tag tg">Active</span>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--w)">
+        <div style="flex:1"><div style="font-size:11px;font-weight:700;margin-bottom:2px">Deal expires with no offer</div><div style="font-size:9px;color:var(--t3);line-height:1.5">Notify internal only → archive deal → optionally re-blast at lower price</div></div>
+        <span class="tag tg">Active</span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="mo" id="modal" onclick="if(event.target.id==='modal')closeMo()">
+  <div class="mb"><div class="mh"><div class="mt" id="m-title"></div><button class="mx" onclick="closeMo()">✕</button></div><div class="mbody" id="m-body"></div><div class="mft" id="m-ft"></div></div>
+</div>
+<div class="toast-wrap" id="toasts"></div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+const fmt=n=>{if(!n&&n!==0)return'—';const a=Math.abs(Math.round(n));const s=n<0?'-':'';if(a>=1e6)return s+'$'+(a/1e6).toFixed(2)+'M';if(a>=1000)return s+'$'+a.toLocaleString();return s+'$'+a;};
+
+const DEALS=[
+  {id:1,addr:'4718 Peach St NW',city:'Atlanta, GA',sellerAsk:89000,ourList:103000,arv:165000,rehab:35000,tfCost:1335,closingCosts:2400,netProfit:10265,stage:'Blasted',buyerOffers:7,topOffer:99000,emd:2500,emdStatus:'Pending Wire',tc:'Peachtree Title Group',tco:'Sarah Johnson',tce:'sarah@peachtree.com',tcp:'(404) 555-0182',tca:'100 Peachtree St NW, Atlanta GA',tcDoubleClose:true,sellerName:'Marcus Robinson',sellerPhone:'(404) 555-0192',access:'lockbox',lockbox:'4821',type:'SFR'},
+  {id:2,addr:'3302 Tryon St',city:'Charlotte, NC',sellerAsk:72000,ourList:84500,arv:140000,rehab:28000,tfCost:1080,closingCosts:2200,netProfit:9220,stage:'Offer Accepted',buyerOffers:3,topOffer:84500,emd:2000,emdStatus:'Received',tc:'Carolina Closing Group',tco:'James Porter',tce:'jporter@ccclosing.com',tcp:'(704) 555-0291',tca:'400 S Tryon St, Charlotte NC',tcDoubleClose:true,sellerName:'Stephanie Owens',sellerPhone:'(704) 555-0182',access:'vacant-call',lockbox:'',type:'SFR'},
+  {id:3,addr:'8821 Westheimer Rd',city:'Houston, TX',sellerAsk:145000,ourList:171000,arv:230000,rehab:40000,tfCost:2175,closingCosts:2800,netProfit:21025,stage:'Both Signed',buyerOffers:5,topOffer:171000,emd:3500,emdStatus:'Confirmed',tc:'Lone Star Title Co',tco:'Maria Flores',tce:'mflores@lonestar.com',tcp:'(713) 555-0344',tca:'2800 Post Oak Blvd, Houston TX',tcDoubleClose:true,sellerName:'Darius Williams',sellerPhone:'(713) 555-0192',access:'lockbox',lockbox:'7734',type:'SFR'},
+  {id:4,addr:'2201 Gallatin Pike',city:'Nashville, TN',sellerAsk:195000,ourList:224000,arv:290000,rehab:42000,tfCost:2925,closingCosts:3100,netProfit:22975,stage:'New',buyerOffers:0,topOffer:0,emd:5000,emdStatus:'Not Started',tc:'Music City Title',tco:'Robert Barnes',tce:'rbarnes@mctitle.com',tcp:'(615) 555-0211',tca:'150 4th Ave N, Nashville TN',tcDoubleClose:false,sellerName:'Calvin Rogers',sellerPhone:'(615) 555-0192',access:'tenant',lockbox:'',type:'SFR'},
+];
+
+const TFUNDERS=[
+  {name:'DoubleClose.com',contact:'Kelsey',email:'info@doubleclose.com',phone:'(800) 441-2328',rate:1.5,max:2000000,turnaround:'Same day'},
+  {name:'National Transactional Funding',contact:'Sarah Lee',email:'sarah@natfund.com',phone:'(888) 772-4441',rate:1.75,max:5000000,turnaround:'4 hours'},
+];
+
+const APPROVED_TCS={
+  'GA':['Katz Durell LLC','Peachtree Title Group','Georgia Closing Attorneys'],
+  'TX':['Lone Star Title Co','Texas Property Closing','Alamo Title'],
+  'FL':['Sunshine State Title','Florida Closing Co','Gulf Coast Title'],
+  'NC':['Carolina Closing Group','Piedmont Title','Old North Title'],
+  'TN':['Music City Title','Tennessee Closing Co','Volunteer Title'],
+  'IL':['Illinois Closing Attorneys','Chicago Title','Midwest Title Group'],
+};
+
+let selectedDeal=null;let selectedTF=null;
+
+function show(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  document.querySelectorAll('.nt').forEach(n=>n.classList.remove('on'));
+  document.getElementById('view-'+id).classList.add('on');
+  const map={ws:0,buyer:1,command:2,firewall:3,docs:4,showings:5,emd:6,tfund:7,settings:8};
+  if(map[id]!==undefined)document.querySelectorAll('.nt')[map[id]]?.classList.add('on');
+  window.scrollTo(0,0);
+}
+
+function renderCommand(){
+  const el=document.getElementById('command-deals');if(!el)return;
+  el.innerHTML=DEALS.map(d=>{
+    const stageColors={'New':'tgr','Blasted':'tgo','Offer Accepted':'tb','Both Signed':'tg','Closed':'tg'};
+    const sc=stageColors[d.stage]||'tgr';
+    const tcOk=d.tcDoubleClose;
+    const tcWarning=!tcOk?`<div style="background:var(--gold4);border:1px solid rgba(240,165,0,.2);padding:8px 10px;font-size:9px;color:var(--gold2);margin:0 14px 0">⚠️ <strong>${d.tc}</strong> does not confirm double closes. System will substitute <strong>${(APPROVED_TCS[d.city.split(',')[1]?.trim()]||['our preferred title company'])[0]}</strong> for this market.</div>`:'';
+    return`<div class="dcard">
+      <div class="dc-top">
+        <div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:5px">
+            <span class="tag ${sc}">${d.stage}</span>
+            <span class="tag tgr">${d.type}</span>
+            ${!tcOk?'<span class="tag tgo">⚠ TC Substituted</span>':''}
+            <span style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--r2);padding:2px 7px;border:1px solid rgba(255,45,85,.2);background:var(--r3)">🔒 INTERNAL ONLY</span>
+          </div>
+          <div class="dc-addr">${d.addr}</div>
+          <div class="dc-meta">${d.city} · Seller: ${d.sellerName} · ${d.sellerPhone}</div>
+        </div>
+        <div class="dc-pr">
+          <div class="dc-price-lbl">Your List Price (buyer sees this)</div>
+          <div class="dc-price">${fmt(d.ourList)}</div>
+          <div style="font-size:9px;color:var(--t3);margin-top:2px">Seller ask: ${fmt(d.sellerAsk)} (never shown to buyer)</div>
+        </div>
+      </div>
+      <div class="dc-nums" style="grid-template-columns:repeat(7,1fr)">
+        <div class="dn-cell"><div class="dn-l">Seller Ask</div><div class="dn-v" style="color:var(--b2)">${fmt(d.sellerAsk)}</div></div>
+        <div class="dn-cell"><div class="dn-l">Our List Price</div><div class="dn-v" style="color:var(--g)">${fmt(d.ourList)}</div></div>
+        <div class="dn-cell"><div class="dn-l">Gross Spread</div><div class="dn-v" style="color:var(--gold2)">${fmt(d.ourList-d.sellerAsk)}</div></div>
+        <div class="dn-cell"><div class="dn-l">T-Fund Cost</div><div class="dn-v" style="color:var(--r)">${fmt(d.tfCost)}</div></div>
+        <div class="dn-cell"><div class="dn-l">Closing Costs</div><div class="dn-v" style="color:var(--r)">${fmt(d.closingCosts)}</div></div>
+        <div class="dn-cell"><div class="dn-l">Net Profit</div><div class="dn-v" style="color:${d.netProfit>=10000?'var(--g)':'var(--r2)'}">${fmt(d.netProfit)}</div></div>
+        <div class="dn-cell"><div class="dn-l">EMD Required</div><div class="dn-v" style="color:var(--gold2)">${fmt(d.emd)}</div></div>
+      </div>
+      ${tcWarning}
+      <div class="pipeline" style="grid-template-columns:repeat(6,1fr);border-top:1px solid var(--w)">
+        ${[
+          {n:'A-Side Signed',s:['New','Blasted','Offer Accepted','Both Signed','Closed'].includes(d.stage)?'done':'pend',t:'Seller agreement'},
+          {n:'Deal Blasted',s:['Blasted','Offer Accepted','Both Signed','Closed'].includes(d.stage)?'done':'pend',t:'To matched buyers'},
+          {n:'Offer Accepted',s:['Offer Accepted','Both Signed','Closed'].includes(d.stage)?'done':d.stage==='Blasted'?'active':'pend',t:`${d.buyerOffers} offers in`},
+          {n:'B-Side Signed',s:['Both Signed','Closed'].includes(d.stage)?'done':d.stage==='Offer Accepted'?'active':'pend',t:'Buyer agreement'},
+          {n:'EMD Collected',s:d.emdStatus==='Confirmed'?'done':d.emdStatus==='Received'?'done':d.emdStatus==='Pending Wire'?'active':'pend',t:d.emdStatus},
+          {n:'T-Fund + Close',s:d.stage==='Closed'?'done':d.stage==='Both Signed'?'active':'pend',t:'Double close'},
+        ].map(p=>`<div class="pipe-step ${p.s}">
+          <div class="pipe-accent" style="background:${p.s==='done'?'var(--g)':p.s==='active'?'var(--gold)':'transparent'}"></div>
+          <div>
+            <div style="font-size:9px;font-weight:700;color:${p.s==='done'?'var(--g)':p.s==='active'?'var(--gold2)':'var(--t3)'}">${p.s==='done'?'✓ ':p.s==='active'?'⚡ ':'○ '}${p.n}</div>
+            <div style="font-size:8px;color:var(--t3);margin-top:1px">${p.t}</div>
+          </div>
+        </div>`).join('')}
+      </div>
+      <div style="padding:10px 14px;border-top:1px solid var(--w);background:var(--b4)">
+        <div style="font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--b2);margin-bottom:5px">Title Company — EMD Wire Destination</div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:10px">
+          <div><div style="font-size:7px;color:var(--t3)">Company</div><div style="font-weight:700">${d.tc} ${tcOk?'<span style="color:var(--g);font-size:8px">✓ Approved</span>':'<span style="color:var(--gold2);font-size:8px">⚠ Substituted</span>'}</div></div>
+          <div><div style="font-size:7px;color:var(--t3)">Officer</div><div style="font-weight:700">${d.tco}</div></div>
+          <div><div style="font-size:7px;color:var(--t3)">Email</div><div style="font-weight:700">${d.tce}</div></div>
+          <div><div style="font-size:7px;color:var(--t3)">Phone</div><div style="font-weight:700">${d.tcp}</div></div>
+        </div>
+      </div>
+      <div class="dc-bot">
+        <button class="btn btn-g btn-sm" onclick="openDealModal(${d.id})">Full Detail →</button>
+        <button class="btn btn-gold btn-sm" onclick="blastDeal(${d.id})">⚡ Blast to Buyers</button>
+        <button class="btn btn-pu btn-sm" onclick="selectForTFund(${d.id})">📧 T-Funder Package</button>
+        <button class="btn btn-b btn-sm" onclick="show('docs')">📋 Documents</button>
+        <div style="margin-left:auto;font-size:9px;color:var(--t3)">${d.buyerOffers} offers · Top: ${fmt(d.topOffer)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderDocs(){
+  const el=document.getElementById('docs-list');if(!el)return;
+  el.innerHTML=DEALS.map(d=>`
+    <div style="background:var(--bg2);border:1px solid var(--w);margin-bottom:12px;overflow:hidden">
+      <div style="padding:12px 14px;border-bottom:1px solid var(--w);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div><div style="font-size:12px;font-weight:700">${d.addr}, ${d.city}</div><div style="font-size:9px;color:var(--t3)">${d.stage}</div></div>
+        <span class="tag tg">Firewalled</span>
+      </div>
+      ${[
+        {icon:'📄',name:'A-Side Purchase Agreement',sub:'PropX buys from '+d.sellerName,party:'Seller only — never shown to buyer',status:['New'].includes(d.stage)?'Not Generated':'Signed',statusColor:['New'].includes(d.stage)?'var(--t3)':'var(--g)'},
+        {icon:'📄',name:'B-Side Purchase Agreement',sub:'PropX sells to buyer',party:'Buyer only — never shown to seller',status:['New','Blasted'].includes(d.stage)?'Pending Offer':d.stage==='Offer Accepted'?'Awaiting Signature':'Signed',statusColor:['New','Blasted'].includes(d.stage)?'var(--t3)':d.stage==='Offer Accepted'?'var(--gold2)':'var(--g)'},
+        {icon:'📋',name:'Title Company Instructions',sub:'Simultaneous close coordination',party:'Title company only',status:'Auto-Generated',statusColor:'var(--g)'},
+        {icon:'📧',name:'T-Funder Funding Request',sub:'A+B contracts · POF · Title info',party:'T-funder only — never shown to seller or buyer',status:d.stage==='Both Signed'?'Ready to Send':'Pending B-Side',statusColor:d.stage==='Both Signed'?'var(--gold2)':'var(--t3)'},
+        {icon:'💰',name:'EMD Wire Instructions',sub:'Title company wiring info for buyer',party:'Buyer only',status:d.emdStatus,statusColor:d.emdStatus==='Confirmed'?'var(--g)':d.emdStatus==='Pending Wire'?'var(--gold2)':'var(--t3)'},
+      ].map(doc=>`
+        <div class="doc-item">
+          <div class="doc-icon">${doc.icon}</div>
+          <div style="flex:1">
+            <div style="font-size:11px;font-weight:700;margin-bottom:1px">${doc.name}</div>
+            <div style="font-size:9px;color:var(--t3);margin-bottom:2px">${doc.sub}</div>
+            <div style="font-size:8px;padding:2px 6px;display:inline-flex;background:var(--r3);color:var(--r2);border:1px solid rgba(255,45,85,.15);font-weight:700;letter-spacing:.5px">🔒 ${doc.party}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-size:9px;font-weight:700;color:${doc.statusColor}">${doc.status}</div>
+            <div style="display:flex;gap:4px;margin-top:5px;justify-content:flex-end">
+              <button class="btn btn-o btn-xs" onclick="toast('👁','View','Document opened.')">View</button>
+              <button class="btn btn-g btn-xs" onclick="toast('📧','Sent','Document sent to correct party only.')">Send</button>
+            </div>
+          </div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+function renderShowings(){
+  const el=document.getElementById('showings-list');if(!el)return;
+  const showings=[
+    {buyer:'James Washington',buyerCo:'JW Capital Investments',deal:'4718 Peach St NW, Atlanta GA',time:'Tomorrow · 2:00 PM',access:'Lockbox — code sent after POF verified',sellerContact:'Marcus Robinson · (404) 555-0192',status:'Confirmed',autoMsg:'Our inspection team will view the property tomorrow at 2pm. Please ensure access is available.'},
+    {buyer:'Greg Holloway',buyerCo:'Tampa REI Group',deal:'5590 N Dale Mabry, Tampa FL',time:'Thursday · 11:00 AM',access:'Occupied — seller contact notified',sellerContact:'Roberto Vega · (813) 555-0181',status:'Pending',autoMsg:'Our team needs to schedule a property review. Are you available Thursday between 10am-12pm?'},
+  ];
+  el.innerHTML=`<div style="background:var(--g4);border:1px solid rgba(0,204,122,.1);padding:12px 14px;margin-bottom:14px;font-size:10px;color:var(--t2);line-height:1.6">✓ All showing requests are auto-coordinated. Buyer is told "access arranged." Seller is told "our inspection team is coming." Neither knows the other exists.</div>`+
+  showings.map(s=>`<div class="showing-card">
+    <div class="sc-top">
+      <div><div class="sc-buyer">${s.buyer} <span style="font-size:9px;color:var(--t3);font-weight:400">· ${s.buyerCo}</span></div><div class="sc-deal">${s.deal}</div></div>
+      <div><div class="sc-time">${s.time}</div><span class="tag ${s.status==='Confirmed'?'tg':'tgo'}" style="float:right;margin-top:4px">${s.status}</span></div>
+    </div>
+    <div class="sc-auto-note"><strong style="color:var(--g)">Auto-message sent to seller (${s.sellerContact}):</strong><br>"${s.autoMsg}"</div>
+  </div>`).join('');
+}
+
+function renderEMD(){
+  const el=document.getElementById('emd-list');if(!el)return;
+  const emds=[
+    {deal:'4718 Peach St NW',city:'Atlanta GA',buyer:'James Washington',amount:2500,status:'Pending Wire',due:'Due in 18 hours',tc:'Peachtree Title Group',tco:'Sarah Johnson',tce:'sarah@peachtree.com',steps:[{done:true,txt:'Offer accepted — B-side DocuSign sent'},{done:true,txt:'Buyer signed agreement'},{done:true,txt:'Wire instructions sent to buyer'},{done:false,txt:'EMD received by title company'},{done:false,txt:'Escrow confirmed'}]},
+    {deal:'3302 Tryon St',city:'Charlotte NC',buyer:'Sandra Brooks',amount:2000,status:'Received',due:'Confirmed',tc:'Carolina Closing Group',tco:'James Porter',tce:'jporter@ccclosing.com',steps:[{done:true,txt:'Offer accepted'},{done:true,txt:'Buyer signed'},{done:true,txt:'Wire sent'},{done:true,txt:'$2,000 received'},{done:false,txt:'Applied at closing'}]},
+    {deal:'8821 Westheimer Rd',city:'Houston TX',buyer:'Greg Holloway',amount:3500,status:'Confirmed',due:'Applied at closing',tc:'Lone Star Title Co',tco:'Maria Flores',tce:'mflores@lonestar.com',steps:[{done:true,txt:'All steps complete'},{done:true,txt:'$3,500 in escrow'},{done:true,txt:'Closing scheduled'},{done:false,txt:'Applied at close'},{done:false,txt:'Spread wired to account'}]},
+  ];
+  el.innerHTML=emds.map(e=>`<div class="emd-card">
+    <div class="emd-top">
+      <div><div class="emd-deal">${e.deal}, ${e.city}</div><div class="emd-meta">Buyer: ${e.buyer} · ${e.due}</div></div>
+      <div><div class="emd-amount">${fmt(e.amount)}</div><span class="tag ${e.status==='Confirmed'?'tg':e.status==='Received'?'tb':'tgo'}">${e.status}</span></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px">
+      ${e.steps.map(s=>`<div style="display:flex;align-items:center;gap:8px;font-size:10px;color:${s.done?'var(--t2)':'var(--t3)'}"><div style="width:6px;height:6px;border-radius:50%;background:${s.done?'var(--g)':'var(--w2)'};flex-shrink:0"></div>${s.txt}</div>`).join('')}
+    </div>
+    <div class="emd-tc">
+      <div class="emd-tc-title">EMD Wire Destination</div>
+      <div class="emd-tc-row">
+        <div class="emd-tc-item"><div class="emd-tc-lbl">Company</div><div class="emd-tc-val">${e.tc}</div></div>
+        <div class="emd-tc-item"><div class="emd-tc-lbl">Officer</div><div class="emd-tc-val">${e.tco}</div></div>
+        <div class="emd-tc-item"><div class="emd-tc-lbl">Email</div><div class="emd-tc-val">${e.tce}</div></div>
+      </div>
+    </div>
+  </div>`).join('');
+}
+
+function renderTFund(){
+  const dl=document.getElementById('tf-deal-list');if(!dl)return;
+  const ready=DEALS.filter(d=>['Both Signed','Offer Accepted'].includes(d.stage));
+  dl.innerHTML=ready.map(d=>`<div onclick="selectTFDeal(${d.id})" id="tfd-${d.id}" style="padding:11px 14px;border-bottom:1px solid var(--w);cursor:pointer;transition:background .15s" onmouseenter="this.style.background='var(--bg3)'" onmouseleave="this.style.background=selectedDeal===${d.id}?'var(--bg4)':'transparent'">
+    <div style="font-size:11px;font-weight:700;margin-bottom:2px">${d.addr}</div>
+    <div style="font-size:9px;color:var(--t3);margin-bottom:4px">${d.city} · A: ${fmt(d.sellerAsk)} → B: ${fmt(d.ourList)}</div>
+    <div style="display:flex;gap:4px"><span class="tag tg">Net: ${fmt(d.netProfit)}</span><span class="tag ${d.stage==='Both Signed'?'tg':'tgo'}">${d.stage}</span></div>
+  </div>`).join('');
+  const tc=document.getElementById('tf-contacts');if(!tc)return;
+  tc.innerHTML=TFUNDERS.map((tf,i)=>`<div onclick="selectTFContact(${i})" id="tfc-${i}" style="padding:11px 14px;border-bottom:1px solid var(--w);cursor:pointer;transition:background .15s" onmouseenter="this.style.background='var(--bg3)'" onmouseleave="this.style.background=selectedTF===i?'var(--bg4)':'transparent'">
+    <div style="font-size:11px;font-weight:700;margin-bottom:1px">${tf.name}</div>
+    <div style="font-size:9px;color:var(--t3)">${tf.contact} · ${tf.rate}% rate</div>
+    <div style="font-size:9px;color:var(--g);margin-top:2px">⚡ ${tf.turnaround}</div>
+  </div>`).join('');
+  const cl=document.getElementById('tf-checklist');if(!cl)return;
+  const checks=['A-Side Purchase Contract','B-Side Purchase Contract','Buyer Proof of Funds','Title Company Wire Info','Property Address & Legal','A-Side Funding Amount','B-Side Sale Amount','Target Closing Date'];
+  cl.innerHTML=`<div style="padding:10px 14px">`+checks.map(c=>`<div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--w);font-size:10px;color:var(--t2)"><span style="color:var(--t3);font-size:9px" id="chk-${c.replace(/\W/g,'').slice(0,10)}">○</span>${c}</div>`).join('')+'</div>';
+}
+
+function selectTFDeal(id){
+  selectedDeal=id;
+  document.querySelectorAll('[id^="tfd-"]').forEach(el=>el.style.background='transparent');
+  const el=document.getElementById('tfd-'+id);if(el)el.style.background='var(--bg4)';
+  updateTFEmail();
+}
+
+function selectTFContact(i){
+  selectedTF=i;
+  document.querySelectorAll('[id^="tfc-"]').forEach(el=>el.style.background='transparent');
+  const el=document.getElementById('tfc-'+i);if(el)el.style.background='var(--bg4)';
+  updateTFEmail();
+}
+
+function updateTFEmail(){
+  if(!selectedDeal||selectedTF===null)return;
+  const d=DEALS.find(x=>x.id===selectedDeal);
+  const tf=TFUNDERS[selectedTF];
+  const closing=new Date(Date.now()+(12*24*3600000));
+  const closingStr=closing.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  document.getElementById('tf-to').textContent=`${tf.contact} <${tf.email}>`;
+  document.getElementById('tf-subj').textContent=`Funding Request · ${d.addr}, ${d.city} · ${fmt(d.sellerAsk)}`;
+  document.getElementById('tf-attach').textContent=`A-Side Contract · B-Side Contract · Buyer POF · Title Wire Info`;
+  document.getElementById('tf-body').innerHTML=`Hi <strong>${tf.contact}</strong>,<br><br>I need funding for a simultaneous closing. Details:<br><br><strong>Property:</strong> <span class="g">${d.addr}, ${d.city}</span><br><strong>A-Side (your funds):</strong> <span class="gold">${fmt(d.sellerAsk)}</span><br><strong>B-Side (buyer funds):</strong> <span class="gold">${fmt(d.ourList)}</span><br><strong>Your Fee (${tf.rate}%):</strong> ${fmt(d.tfCost)}<br><strong>Title Company:</strong> ${d.tc}<br><strong>Title Officer:</strong> ${d.tco} · ${d.tce} · ${d.tcp}<br><strong>Closing Date:</strong> ${closingStr}<br><br>All signed documents attached. Please confirm fund availability and send wire instructions to title.<br><br><strong>PropX LLC</strong><br><span class="g">deals@propx.us</span>`;
+  document.getElementById('tf-status').textContent=`${d.addr} · ${fmt(d.sellerAsk)} · ${tf.name}`;
+  const btn=document.getElementById('tf-send');
+  if(btn){btn.disabled=false;btn.style.opacity='1';}
+  ['ASidePurch','BSidePurch','BuyerProof','TitleCompa','PropertyAd','ASideFundi','BSideSaleA','TargetClos'].forEach(k=>{
+    const el=document.getElementById('chk-'+k);
+    if(el){el.textContent='✓';el.style.color='var(--g)';}
+  });
+}
+
+function sendTF(){
+  if(!selectedDeal||selectedTF===null)return;
+  const d=DEALS.find(x=>x.id===selectedDeal);
+  const tf=TFUNDERS[selectedTF];
+  toast('📧','Package Sent',`Funding request sent to ${tf.contact} at ${tf.name}.`);
+  setTimeout(()=>toast('✅','Confirmed',`${tf.name} confirmed funding for ${d.addr}.`),5000);
+}
+function copyTF(){toast('📋','Copied','Full T-funder email copied to clipboard.');}
+
+function renderSettings(){
+  const stf=document.getElementById('settings-tfunders');
+  if(stf)stf.innerHTML=TFUNDERS.map(tf=>`<div style="padding:12px 14px;border-bottom:1px solid var(--w);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <div><div style="font-size:11px;font-weight:700;margin-bottom:1px">${tf.name}</div><div style="font-size:9px;color:var(--t3)">${tf.contact} · ${tf.email} · ${tf.rate}% · Up to ${fmt(tf.max)} · ${tf.turnaround}</div></div>
+    <div style="display:flex;gap:5px"><button class="btn btn-o btn-xs">Edit</button><button class="btn btn-g btn-xs">Primary</button></div>
+  </div>`).join('');
+  const stc=document.getElementById('settings-titlecos');
+  if(stc)stc.innerHTML=Object.entries(APPROVED_TCS).map(([state,cos])=>`<div style="padding:10px 14px;border-bottom:1px solid var(--w)">
+    <div style="font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--g);margin-bottom:6px">${state}</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">${cos.map(co=>`<span class="tag tg">✓ ${co}</span>`).join('')}</div>
+  </div>`).join('');
+}
+
+function blastDeal(id){
+  const d=DEALS.find(x=>x.id===id);
+  toast('⚡','Blasting...','Running buy box match engine...');
+  setTimeout(()=>toast('📧','Blast Sent',`${d?.addr} blasted to matched buyers. Seller ask stripped.`),2000);
+}
+
+function openDealModal(id){
+  const d=DEALS.find(x=>x.id===id);if(!d)return;
+  document.getElementById('m-title').textContent=d.addr+' — Internal View';
+  document.getElementById('m-body').innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--w);border:1px solid var(--w);margin-bottom:14px">
+    ${[['Seller Ask',fmt(d.sellerAsk),'var(--b2)'],['List Price',fmt(d.ourList),'var(--g)'],['Gross Spread',fmt(d.ourList-d.sellerAsk),'var(--gold2)'],['T-Fund Cost','-'+fmt(d.tfCost),'var(--r2)'],['Closing Costs','-'+fmt(d.closingCosts),'var(--r2)'],['Net Profit',fmt(d.netProfit),'var(--g)']].map(([l,v,c])=>`<div style="background:var(--bg3);padding:11px 12px"><div style="font-size:7px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-bottom:3px">${l}</div><div style="font-family:var(--mono);font-size:15px;font-weight:700;color:${c}">${v}</div></div>`).join('')}
+  </div>`;
+  document.getElementById('m-ft').innerHTML=`<button class="mbtn mbtn-o" onclick="closeMo()">Close</button><button class="mbtn mbtn-gold" onclick="closeMo();selectForTFund(${d.id})">📧 T-Funder Package</button>`;
+  document.getElementById('modal').classList.add('on');
+}
+
+function selectForTFund(id){selectedDeal=id;show('tfund');setTimeout(()=>selectTFDeal(id),100);}
+
+function openMo(type){
+  if(type==='add-tf'){
+    document.getElementById('m-title').textContent='Add T-Funder';
+    document.getElementById('m-body').innerHTML=`<div class="fi"><label>Company Name</label><input placeholder="Quick Close Capital"/></div><div class="fi-2"><div class="fi"><label>Contact Name</label><input placeholder="Brian Walsh"/></div><div class="fi"><label>Email</label><input type="email" placeholder="brian@qcc.com"/></div></div><div class="fi-2"><div class="fi"><label>Rate (%)</label><input type="number" value="1.5" step="0.1"/></div><div class="fi"><label>Max Funding ($)</label><input type="number" placeholder="2000000"/></div></div>`;
+    document.getElementById('m-ft').innerHTML=`<button class="mbtn mbtn-o" onclick="closeMo()">Cancel</button><button class="mbtn mbtn-g" onclick="toast('✅','T-Funder Added','Saved.');closeMo()">Save</button>`;
+  }
+  if(type==='add-tc'){
+    document.getElementById('m-title').textContent='Add Title Company';
+    document.getElementById('m-body').innerHTML=`<div class="fi"><label>Title Company Name</label><input placeholder="Peachtree Title Group"/></div><div class="fi-2"><div class="fi"><label>State</label><select>${Object.keys(APPROVED_TCS).map(s=>`<option>${s}</option>`).join('')}</select></div><div class="fi"><label>Handles Simultaneous Closings?</label><select><option>Yes</option><option>No</option></select></div></div><div class="fi"><label>Title Officer Email</label><input type="email" placeholder="officer@titleco.com"/></div>`;
+    document.getElementById('m-ft').innerHTML=`<button class="mbtn mbtn-o" onclick="closeMo()">Cancel</button><button class="mbtn mbtn-g" onclick="toast('✅','Added','Title company saved.');closeMo()">Add</button>`;
+  }
+  document.getElementById('modal').classList.add('on');
+}
+function closeMo(){document.getElementById('modal').classList.remove('on');}
+
+function toast(icon,title,msg){
+  const w=document.getElementById('toasts');const t=document.createElement('div');t.className='toast';
+  t.innerHTML=`<div class="ti">${icon}</div><div><div class="tt">${title}</div><div class="tm">${msg}</div></div>`;
+  w.appendChild(t);setTimeout(()=>{t.style.cssText='opacity:0;transform:translateX(10px);transition:all .25s';setTimeout(()=>t.remove(),250);},4500);
+}
+
+renderCommand();renderDocs();renderShowings();renderEMD();renderTFund();renderSettings();
+setTimeout(()=>t
